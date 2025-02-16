@@ -25,21 +25,48 @@
 </template>
 
 <script>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { auth, database } from '@/firebase' // Import Firebase config
+import { signInWithEmailAndPassword } from 'firebase/auth'
+import { ref as dbRef, get } from 'firebase/database'
+
 export default {
-  data() {
-    return {
-      email: '',
-      password: '',
-      rememberMe: false,
+  setup() {
+    const email = ref('')
+    const password = ref('')
+    const rememberMe = ref(false)
+    const router = useRouter()
+
+    const handleLogin = async () => {
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value)
+        const user = userCredential.user
+
+        // Lấy role từ Firebase Realtime Database
+        const userRef = dbRef(database, `authentication/${user.uid}/Role`)
+        const snapshot = await get(userRef)
+
+        if (snapshot.exists()) {
+          const role = snapshot.val()
+          if (role === 'admin') {
+            router.push('/admin-home')
+          } else {
+            router.push('/user-home')
+          }
+        } else {
+          console.error('User role not found in database')
+        }
+      } catch (error) {
+        console.error('Login failed:', error.message)
+      }
     }
-  },
-  methods: {
-    handleLogin() {
-      console.log('Login button clicked')
-    },
+
+    return { email, password, rememberMe, handleLogin }
   },
 }
 </script>
+
 
 <style scoped>
 /* Container */

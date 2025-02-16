@@ -20,7 +20,6 @@
         <input type="password" v-model="password" required placeholder="Create a password" />
       </div>
 
-      <!-- Checkbox for Terms & Conditions -->
       <div class="terms-conditions">
         <input type="checkbox" v-model="agreeToTerms" required />
         <label class="label-text2">
@@ -29,6 +28,7 @@
       </div>
 
       <button type="submit" :disabled="!agreeToTerms">Sign Up</button>
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
     </form>
     <p class="login-link">
       Already have an account?
@@ -36,36 +36,59 @@
     </p>
   </div>
 </template>
-  
-  <script>
+
+<script>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { auth, database } from '@/firebase'
+import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { ref as dbRef, set } from 'firebase/database'
+
 export default {
-  data() {
-    return {
-      firstName: '',
-      lastName: '',
-      email: '',
-      password: '',
-      agreeToTerms: false, // Track checkbox state
-    }
-  },
-  methods: {
-    handleRegister() {
-      if (!this.agreeToTerms) {
-        alert('You must agree to the Terms & Conditions to register.')
+  setup() {
+    const firstName = ref('')
+    const lastName = ref('')
+    const email = ref('')
+    const password = ref('')
+    const agreeToTerms = ref(false)
+    const errorMessage = ref('')
+    const router = useRouter()
+
+    const handleRegister = async () => {
+      if (!agreeToTerms.value) {
+        errorMessage.value = 'You must agree to the Terms & Conditions to register.'
         return
       }
-      console.log('Register button clicked with:', {
-        firstName: this.firstName,
-        lastName: this.lastName,
-        email: this.email,
-        password: this.password,
-      })
-    },
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email.value,
+          password.value
+        )
+        const user = userCredential.user
+
+        // Lưu thông tin vào Firebase Database
+        await set(dbRef(database, `authentication/${user.uid}`), {
+          FirstName: firstName.value,
+          LastName: lastName.value,
+          Email: email.value,
+          Role: 'user', // Mặc định role là user
+        })
+
+        // Chuyển hướng đến trang đăng nhập sau khi đăng ký thành công
+        router.push('/login')
+      } catch (error) {
+        errorMessage.value = error.message
+      }
+    }
+
+    return { firstName, lastName, email, password, agreeToTerms, handleRegister, errorMessage }
   },
 }
 </script>
-  
-  <style scoped>
+
+<style scoped>
 /* Container */
 .register-form {
   background: white;
@@ -75,6 +98,7 @@ export default {
   width: 350px;
 }
 
+/* Heading */
 .label-text {
   font-size: 24px;
   font-weight: bold;
@@ -157,6 +181,13 @@ button:disabled {
   cursor: not-allowed;
 }
 
+/* Error Message */
+.error-message {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
 /* Login Link */
 .login-link {
   margin-top: 1rem;
@@ -173,4 +204,3 @@ button:disabled {
   text-decoration: underline;
 }
 </style>
-  
