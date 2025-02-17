@@ -1,7 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AuthenticationView from '@/views/AuthenticationView.vue'
-import LoginForm from '@/components/Authentication/LoginForm.vue'
-import RegisterForm from '@/components/Authentication/RegisterForm.vue'
 import UserHome from '@/views/UserHome.vue'
 import AdminHome from '@/views/AdminHome.vue'
 
@@ -10,19 +8,12 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      redirect: '/authentication', // Mặc định chuyển hướng đến trang Authentication
+    },
+    {
+      path: '/authentication',
       name: 'authentication',
       component: AuthenticationView,
-      redirect: '/login',
-    },
-    {
-      path: '/login',
-      name: 'login',
-      component: LoginForm,
-    },
-    {
-      path: '/register',
-      name: 'register',
-      component: RegisterForm,
     },
     {
       path: '/admin-home',

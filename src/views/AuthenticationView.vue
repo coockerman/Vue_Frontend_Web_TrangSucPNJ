@@ -3,11 +3,29 @@
     <div class="logo-section">
       <img src="@/assets/Img/Logo.png" alt="PNJ Logo" class="logo" />
     </div>
-    <div class="form-section">
-      <router-view />
-    </div>
+    <LoginForm v-if="isLogin" @toggle-form="toggleForm" />
+    <RegisterForm v-else @toggle-form="toggleForm" />
   </div>
 </template>
+
+<script>
+import LoginForm from '@/components/Authentication/LoginForm.vue'
+import RegisterForm from '@/components/Authentication/RegisterForm.vue'
+import { ref } from 'vue'
+
+export default {
+  components: { LoginForm, RegisterForm },
+  setup() {
+    const isLogin = ref(true)
+
+    const toggleForm = () => {
+      isLogin.value = !isLogin.value
+    }
+
+    return { isLogin, toggleForm }
+  },
+}
+</script>
 
 <style scoped>
 .auth-container {

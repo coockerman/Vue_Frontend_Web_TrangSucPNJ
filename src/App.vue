@@ -5,15 +5,15 @@ import AuthenticationViewVue from './views/AuthenticationView.vue'
 
 <template>
   <div class="full-screen">
-    <AuthenticationViewVue />
+    <router-view />
   </div>
 </template>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Prata&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 .full-screen {
   width: 100vw; /* Chiếm toàn bộ chiều rộng */
-  height: 100vh; /* Chiếm toàn bộ chiều cao */
-  display: flex;
   justify-content: center;
   align-items: center;
   background-color: #ffffff; /* Đảm bảo nền trắng */

@@ -19,7 +19,7 @@
     </form>
     <p class="register-link">
       Don't have an account?
-      <RouterLink to="/register">Sign up here</RouterLink>
+      <a href="#" @click.prevent="$emit('toggle-form')">Sign up here</a>
     </p>
   </div>
 </template>
@@ -27,12 +27,13 @@
 <script>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { auth, database } from '@/firebase' // Import Firebase config
+import { auth, database } from '@/firebase'
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import { ref as dbRef, get } from 'firebase/database'
 
 export default {
-  setup() {
+  emits: ['toggle-form'],
+  setup(_, { emit }) {
     const email = ref('')
     const password = ref('')
     const rememberMe = ref(false)
@@ -43,7 +44,6 @@ export default {
         const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value)
         const user = userCredential.user
 
-        // Lấy role từ Firebase Realtime Database
         const userRef = dbRef(database, `authentication/${user.uid}/Role`)
         const snapshot = await get(userRef)
 
@@ -66,6 +66,7 @@ export default {
   },
 }
 </script>
+
 
 
 <style scoped>

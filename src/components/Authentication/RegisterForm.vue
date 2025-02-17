@@ -32,7 +32,7 @@
     </form>
     <p class="login-link">
       Already have an account?
-      <RouterLink to="/login">Login here</RouterLink>
+      <a href="#" @click.prevent="$emit('toggle-form')">Login here</a>
     </p>
   </div>
 </template>
