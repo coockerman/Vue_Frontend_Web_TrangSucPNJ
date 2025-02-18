@@ -32,7 +32,7 @@ export default {
   padding: 60px 40px;
   border-radius: 8px;
   margin: 30px 60px;
-  height: 500px;
+  height: 400px;
   padding-left: 80px; /* Dịch nội dung sang phải một chút */
 }
 

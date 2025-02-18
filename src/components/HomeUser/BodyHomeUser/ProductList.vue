@@ -31,6 +31,9 @@ export default {
 .product-list {
   text-align: center;
   padding: 30px;
+  margin: 30px 50px;
+  border-radius: 8px;
+  background-color: rgb(240, 240, 240);
 }
 
 .title {

@@ -12,6 +12,7 @@ import AuthenticationViewVue from './views/AuthenticationView.vue'
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Prata&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
 .full-screen {
   width: 100vw; /* Chiếm toàn bộ chiều rộng */
   justify-content: center;

@@ -40,8 +40,8 @@
 </template>
   
   <script>
-import PromotionCard from '@/components/HomeUser/PromotionSection/PromotionCard.vue'
-import MiddleComponent from '@/components/HomeUser/PromotionSection/MiddleComponent.vue'
+import PromotionCard from '@/components/HomeUser/BodyHomeUser/PromotionSection/PromotionCard.vue'
+import MiddleComponent from '@/components/HomeUser/BodyHomeUser/PromotionSection/MiddleComponent.vue'
 export default {
   components: {
     PromotionCard,
@@ -51,10 +51,10 @@ export default {
 </script>
   
   <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Prata&display=swap');
 .promotion-section {
   display: flex;
   flex-direction: column;
+  margin-top: 50px;
   gap: 20px;
 }
 .title {

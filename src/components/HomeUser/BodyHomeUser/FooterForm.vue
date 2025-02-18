@@ -49,11 +49,11 @@
       <div class="footer-col">
         <h3>PHƯƠNG THỨC THANH TOÁN</h3>
         <div class="payment-methods">
-          <img src="@/assets/Img/Logo.png" alt="Visa" />
-          <img src="@/assets/Img/Logo.png" alt="MasterCard" />
-          <img src="@/assets/Img/Logo.png" alt="PayPal" />
-          <img src="@/assets/Img/Logo.png" alt="Apple Pay" />
-          <img src="@/assets/Img/Logo.png" alt="Google Pay" />
+          <img src="@/assets/Logo/Visa.png" alt="Visa" />
+          <img src="@/assets/Logo/MasterCard.png" alt="MasterCard" />
+          <img src="@/assets/Logo/Paypal.png" alt="PayPal" />
+          <img src="@/assets/Logo/ApplePay.png" alt="Apple Pay" />
+          <img src="@/assets/Logo/GooglePay.png" alt="Google Pay" />
         </div>
         <h3>KẾT NỐI VỚI CHÚNG TÔI</h3>
         <div class="social-icons">
