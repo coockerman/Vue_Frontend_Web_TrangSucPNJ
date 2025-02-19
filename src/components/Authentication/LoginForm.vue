@@ -1,7 +1,11 @@
 <template>
   <div class="login-form">
-    <h2 class="label-text">Welcome 👋</h2>
+    <h2 class="label-text">Welcome</h2>
     <p class="label-text3">Please login here</p>
+
+    <!-- Hiển thị thông báo lỗi -->
+    <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+
     <form @submit.prevent="handleLogin">
       <div class="input-group">
         <label class="label-text2">Email Address</label>
@@ -17,6 +21,7 @@
       </div>
       <button type="submit">Login</button>
     </form>
+
     <p class="register-link">
       Don't have an account?
       <a href="#" @click.prevent="$emit('toggle-form')">Sign up here</a>
@@ -37,9 +42,12 @@ export default {
     const email = ref('')
     const password = ref('')
     const rememberMe = ref(false)
+    const errorMessage = ref('') // Biến lưu lỗi
     const router = useRouter()
 
     const handleLogin = async () => {
+      errorMessage.value = '' // Reset lỗi trước khi thử đăng nhập
+
       try {
         const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value)
         const user = userCredential.user
@@ -55,14 +63,14 @@ export default {
             router.push('/user-home')
           }
         } else {
-          console.error('User role not found in database')
+          errorMessage.value = 'User role not found. Please contact support.'
         }
       } catch (error) {
-        console.error('Login failed:', error.message)
+        errorMessage.value = 'Tài khoản hoặc mật khẩu không đúng' // Hiển thị lỗi
       }
     }
 
-    return { email, password, rememberMe, handleLogin }
+    return { email, password, rememberMe, errorMessage, handleLogin }
   },
 }
 </script>
@@ -161,6 +169,12 @@ button:hover {
   color: #000000;
   text-decoration: none;
   font-weight: bold;
+}
+
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 10px;
 }
 
 .register-link a:hover {

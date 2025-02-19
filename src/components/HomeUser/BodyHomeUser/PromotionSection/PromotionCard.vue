@@ -46,7 +46,7 @@ export default {
 }
 
 .promotion-image {
-  width: 55%;
+  width: 60%;
   height: 350px;
   border-radius: 10px;
   object-fit: cover;
@@ -81,7 +81,7 @@ p {
 }
 
 .promotion-image-child {
-  width: 150px;
+  width: 180px;
   height: auto;
   border-radius: 8px;
   margin-bottom: 10px; /* Tạo khoảng cách giữa ảnh và nút */
