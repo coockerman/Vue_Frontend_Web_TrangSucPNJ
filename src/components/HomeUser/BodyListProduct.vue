@@ -8,100 +8,44 @@
     </div>
   </div>
 </template>
-  
-  <script setup>
-import { ref } from 'vue'
+
+<script setup>
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
 import FilterSidebar from '@/components/HomeUser/BodyListProduct/FilterSidebar.vue'
 import ProductList from '@/components/HomeUser/BodyListProduct/ProductList.vue'
 
-const allProducts = ref([
-  {
-    id: 1,
-    name: 'Nhẫn Vàng Trắng Ý 24K Đính',
-    price: 10999999,
-    oldPrice: null,
-    rating: 3.5,
-    material: 'gold',
-    image: '/src/assets/Img/Logo.png',
-  },
-  {
-    id: 2,
-    name: 'Nhẫn Vàng Trắng Tipping 24K',
-    price: 31500000,
-    oldPrice: null,
-    rating: 4.5,
-    material: 'gold',
-    image: '/src/assets/Img/Logo.png',
-  },
-  {
-    id: 3,
-    name: 'Nhẫn Vàng Trắng 24K Striped',
-    price: 40295000,
-    oldPrice: 21000000,
-    discount: 30,
-    rating: 5.0,
-    material: 'gold',
-    image: '/src/assets/Img/Logo.png',
-  },
-  {
-    id: 4,
-    name: 'Nhẫn Vàng Trắng Ý 24K Đính',
-    price: 27295000,
-    oldPrice: 21000000,
-    discount: 30,
-    rating: 3.5,
-    material: 'gold',
-    image: '/src/assets/Img/Logo.png',
-  },
-  {
-    id: 5,
-    name: 'Nhẫn Vàng Trắng Ý 24K Đính',
-    price: 15500000,
-    oldPrice: null,
-    rating: 4.5,
-    material: 'gold',
-    image: '/src/assets/Img/Logo.png',
-  },
-  {
-    id: 6,
-    name: 'Nhẫn Vàng Trắng 24K Đính',
-    price: 250295000,
-    oldPrice: 210000000,
-    discount: 30,
-    rating: 4.5,
-    material: 'gold',
-    image: '/src/assets/Img/Logo.png',
-  },
-  {
-    id: 7,
-    name: 'Nhẫn Vàng Trắng Ý 24K',
-    price: 20295000,
-    oldPrice: null,
-    rating: 5.0,
-    material: 'gold',
-    image: '/src/assets/Img/Logo.png',
-  },
-  {
-    id: 8,
-    name: 'Nhẫn Vàng Trắng Ý 24K',
-    price: 35500000,
-    oldPrice: null,
-    rating: 4.0,
-    material: 'gold',
-    image: '/src/assets/Img/Logo.png',
-  },
-  {
-    id: 9,
-    name: 'Nhẫn Vàng Trắng Ý 24K Đính',
-    price: 29500000,
-    oldPrice: null,
-    rating: 3.0,
-    material: 'gold',
-    image: '/src/assets/Img/Logo.png',
-  },
-])
+const allProducts = ref([])
+const filteredProducts = ref([])
 
-const filteredProducts = ref(allProducts.value)
+// Hàm lấy dữ liệu từ API
+const fetchProducts = async () => {
+  try {
+    const response = await axios.get('https://localhost:7241/api/products/all')
+
+    // Chuyển đổi dữ liệu từ API sang đúng format cần dùng
+    allProducts.value = response.data.map((product) => ({
+      id: product.id,
+      name: product.nameProduct,
+      price: product.sizePrice.length > 0 ? product.sizePrice[0].price : 0, // Lấy giá của size đầu tiên
+      oldPrice: null, // Nếu có oldPrice thì cần cập nhật lại
+      rating:
+        product.listEvaluation.length > 0
+          ? product.listEvaluation.reduce((sum, e) => sum + e.rating, 0) /
+            product.listEvaluation.length
+          : 0, // Tính trung bình rating
+      material: product.material,
+      image: product.productImg.length > 0 ? product.productImg[0] : '/src/assets/Img/Logo.png',
+    }))
+
+    filteredProducts.value = allProducts.value // Gán dữ liệu ban đầu
+  } catch (error) {
+    console.error('Lỗi khi lấy dữ liệu từ API:', error)
+  }
+}
+
+// Gọi API khi component được tạo
+onMounted(fetchProducts)
 
 const updateFilters = (filters) => {
   filteredProducts.value = allProducts.value.filter(
@@ -114,8 +58,8 @@ const updateFilters = (filters) => {
 .product-page {
   display: flex;
   gap: 10px;
-  max-width: 1000px; /* Giới hạn chiều rộng để không tràn màn hình */
-  margin: 0 auto; /* Căn giữa trang */
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
 .sidebar {
