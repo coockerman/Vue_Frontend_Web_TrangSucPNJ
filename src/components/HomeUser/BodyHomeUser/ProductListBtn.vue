@@ -3,8 +3,10 @@
     <h2 class="title">{{ title }}</h2>
     <div class="products">
       <div v-for="product in products" :key="product.id" class="product">
-        <img :src="product.image" :alt="product.name" class="product-image" />
-        <p class="product-name">{{ product.name }}</p>
+        <router-link :to="`/user-home/products?type=${encodeURIComponent(product.type)}`">
+          <img :src="product.image" :alt="product.name" class="product-image" />
+          <p class="product-name">{{ product.name }}</p>
+        </router-link>
       </div>
     </div>
     <button class="best-seller">Top Bán Chạy</button>
@@ -74,6 +76,7 @@ export default {
   font-size: 20px; /* Làm chữ sản phẩm to hơn */
   font-weight: 400; /* Làm đậm hơn */
   margin-top: 5px;
+  color: black;
 }
 .best-seller {
   background-color: rgb(172, 56, 67);

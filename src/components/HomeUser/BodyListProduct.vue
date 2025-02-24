@@ -1,55 +1,75 @@
 <template>
   <div class="product-page">
     <div class="sidebar">
-      <FilterSidebar @updateFilters="updateFilters" />
+      <FilterSidebar @updateFilters="applyFilters" />
     </div>
     <div class="product-list">
-      <ProductList :products="filteredProducts" />
+      <ProductList :products="filteredProducts" :category="route.query.type || 'Tất cả sản phẩm'" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import axios from 'axios'
 import FilterSidebar from '@/components/HomeUser/BodyListProduct/FilterSidebar.vue'
 import ProductList from '@/components/HomeUser/BodyListProduct/ProductList.vue'
 
+const route = useRoute()
+
 const allProducts = ref([])
 const filteredProducts = ref([])
+const activeFilters = ref({
+  price: 354299000,
+  material: 'all',
+  karat: 'all',
+  gender: 'all',
+})
 
-// Hàm lấy dữ liệu từ API
-const fetchProducts = async () => {
+// Hàm lấy danh sách sản phẩm theo type
+const fetchProductsByType = async (type) => {
   try {
-    const response = await axios.get('https://localhost:7241/api/products/all')
-
-    // Chuyển đổi dữ liệu từ API sang đúng format cần dùng
-    allProducts.value = response.data.map((product) => ({
+    const response = await axios.get(`https://localhost:7241/api/products/by-type/${type}`)
+    return response.data.map((product) => ({
       id: product.id,
       name: product.nameProduct,
-      price: product.sizePrice.length > 0 ? product.sizePrice[0].price : 0, // Lấy giá của size đầu tiên
-      oldPrice: null, // Nếu có oldPrice thì cần cập nhật lại
+      price: product.sizePrice.length > 0 ? product.sizePrice[0].price : 0,
       rating:
         product.listEvaluation.length > 0
           ? product.listEvaluation.reduce((sum, e) => sum + e.rating, 0) /
             product.listEvaluation.length
-          : 0, // Tính trung bình rating
+          : 0,
       material: product.material,
+      karat: product.karat,
+      gender: product.gender,
       image: product.productImg.length > 0 ? product.productImg[0] : '/src/assets/Img/Logo.png',
     }))
-
-    filteredProducts.value = allProducts.value // Gán dữ liệu ban đầu
   } catch (error) {
-    console.error('Lỗi khi lấy dữ liệu từ API:', error)
+    console.error('Lỗi khi lấy sản phẩm theo loại:', error)
+    return []
   }
 }
 
-// Gọi API khi component được tạo
-onMounted(fetchProducts)
+// Gọi API khi component được mount hoặc type thay đổi
+const fetchProducts = async () => {
+  const type = route.query.type || 'all'
+  allProducts.value = await fetchProductsByType(type)
+  filteredProducts.value = allProducts.value
+}
 
-const updateFilters = (filters) => {
+onMounted(fetchProducts)
+watch(() => route.query.type, fetchProducts) // Theo dõi nếu type thay đổi
+
+// Áp dụng bộ lọc khi người dùng tìm kiếm
+const applyFilters = (filters) => {
+  activeFilters.value = filters
   filteredProducts.value = allProducts.value.filter(
-    (p) => p.material === filters.material || filters.material === 'all'
+    (p) =>
+      (filters.material === 'all' || p.material === filters.material) &&
+      (filters.karat === 'all' || p.karat === filters.karat) &&
+      (filters.gender === 'all' || p.gender === filters.gender) &&
+      p.price <= filters.price
   )
 }
 </script>
@@ -63,6 +83,6 @@ const updateFilters = (filters) => {
 }
 
 .sidebar {
-  width: 20%;
+  width: 25%;
 }
 </style>

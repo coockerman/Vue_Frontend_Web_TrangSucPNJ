@@ -33,26 +33,39 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { auth, database } from '@/firebase'
-import { signInWithEmailAndPassword } from 'firebase/auth'
+import {
+  signInWithEmailAndPassword,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence,
+  onAuthStateChanged,
+} from 'firebase/auth'
 import { ref as dbRef, get } from 'firebase/database'
 
 export default {
-  emits: ['toggle-form'],
-  setup(_, { emit }) {
+  setup() {
     const email = ref('')
     const password = ref('')
     const rememberMe = ref(false)
-    const errorMessage = ref('') // Biến lưu lỗi
+    const errorMessage = ref('')
     const router = useRouter()
 
     const handleLogin = async () => {
-      errorMessage.value = '' // Reset lỗi trước khi thử đăng nhập
+      errorMessage.value = ''
 
       try {
+        // Chọn cách lưu đăng nhập
+        await setPersistence(
+          auth,
+          rememberMe.value ? browserLocalPersistence : browserSessionPersistence
+        )
+
+        // Thực hiện đăng nhập
         const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value)
         const user = userCredential.user
 
-        const userRef = dbRef(database, `authentication/${user.uid}/Role`)
+        // Lấy role của user từ database
+        const userRef = dbRef(database, `users/${user.uid}/role`)
         const snapshot = await get(userRef)
 
         if (snapshot.exists()) {
@@ -66,7 +79,7 @@ export default {
           errorMessage.value = 'User role not found. Please contact support.'
         }
       } catch (error) {
-        errorMessage.value = 'Tài khoản hoặc mật khẩu không đúng' // Hiển thị lỗi
+        errorMessage.value = 'Tài khoản hoặc mật khẩu không đúng'
       }
     }
 
