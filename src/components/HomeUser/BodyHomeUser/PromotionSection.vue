@@ -3,6 +3,7 @@
     <h2 class="title">Món quà tuyệt vời cho tình yêu của bạn</h2>
     <PromotionCard
       title="Vì em là duy nhất"
+      idCollection="OnlyYou"
       description="Bộ sưu tập lấy cảm hứng từ Only You, với hình ảnh chữ O và U lồng ghép vào nhau tạo thành biểu tượng tinh tế, khéo léo mang vào thiết kế để tạo nên chiếc nhẫn cầu hôn với ý nghĩa đặc biệt: Chỉ trao tình yêu duy nhất một đời."
       image="https://firebasestorage.googleapis.com/v0/b/duan-4904c.appspot.com/o/flutter_pnj%2FImage%20Home%2FImage%20B%E1%BB%99%20s%C6%B0u%20t%E1%BA%ADp%2FBosuutap_Onlyyou.png?alt=media&token=39ff59eb-d3e8-45d3-9d2a-d54cdaaf32fd"
       image_child="https://firebasestorage.googleapis.com/v0/b/duan-4904c.appspot.com/o/flutter_pnj%2FTrang%20s%E1%BB%A9c%2FNh%E1%BA%ABn%2FN-B1.1.png?alt=media&token=feabbd77-4376-4ac0-a8bf-a003fd65bf9e"

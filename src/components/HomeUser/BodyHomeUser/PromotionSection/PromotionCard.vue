@@ -11,7 +11,9 @@
           alt="extra image"
           class="promotion-image-child"
         />
-        <button class="cta-button">{{ buttonText }}</button>
+        <router-link :to="{ path: '/user-home/productsByCollection', query: { id: idCollection } }">
+          <button class="cta-button">{{ buttonText }}</button>
+        </router-link>
       </div>
     </div>
   </div>
@@ -26,6 +28,7 @@ export default {
     image_child: String, // Thêm prop mới
     buttonText: String,
     reverse: Boolean,
+    idCollection: String,
   },
 }
 </script>

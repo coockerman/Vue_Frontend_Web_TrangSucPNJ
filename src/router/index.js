@@ -4,6 +4,7 @@ import UserHome from '@/views/UserHome.vue'
 import AdminHome from '@/views/AdminHome.vue'
 import BodyHomeUser from '@/components/HomeUser/BodyHomeUser.vue'
 import BodyListProduct from '@/components/HomeUser/BodyListProduct.vue'
+import BodyListProductByCollection from '@/components/HomeUser/BodyListProductByCollection.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,6 +36,11 @@ const router = createRouter({
           path: 'products',
           name: 'productList',
           component: BodyListProduct,
+        },
+        {
+          path: 'productsByCollection',
+          name: 'productListByCollection',
+          component: BodyListProductByCollection,
         },
       ],
     },
