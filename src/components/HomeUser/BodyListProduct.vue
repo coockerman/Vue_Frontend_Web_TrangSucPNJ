@@ -1,18 +1,27 @@
 <template>
-  <div class="product-page">
-    <div class="sidebar">
-      <FilterSidebar @updateFilters="applyFilters" />
-    </div>
-    <div class="product-list">
-      <ProductList :products="filteredProducts" :category="route.query.type || 'Tất cả sản phẩm'" />
+  <div class="pageMain">
+    <div class="product-page">
+      <div class="sidebar">
+        <FilterSidebar @updateFilters="applyFilters" />
+      </div>
+      <div class="product-list">
+        <ProductList
+          :products="filteredProducts"
+          :category="route.query.type || 'Tất cả sản phẩm'"
+          :itemsPerPage="9"
+        />
+      </div>
     </div>
   </div>
+
+  <Footer />
 </template>
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
+import Footer from '@/components/HomeUser/BodyHomeUser/FooterForm.vue'
 import FilterSidebar from '@/components/HomeUser/BodyListProduct/FilterSidebar.vue'
 import ProductList from '@/components/HomeUser/BodyListProduct/ProductList.vue'
 

@@ -1,4 +1,10 @@
 <template>
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb">
+    <router-link to="/user-home">Home</router-link>
+    <span> > </span>
+    <span>Bộ sưu tập</span>
+  </nav>
   <div class="filter-sidebar">
     <h3 class="filter-title">Lọc</h3>
 
@@ -190,5 +196,30 @@ const formatPrice = (num) => num.toLocaleString('vi-VN')
 
 .search-btn:hover {
   background: #5a1810;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  margin-top: 15px;
+  width: 80%; /* Đảm bảo breadcrumb trải dài toàn bộ chiều ngang */
+  justify-content: flex-start; /* Căn về bên trái */
+  padding-left: 5px; /* Tạo khoảng cách với mép trái */
+}
+
+.breadcrumb a {
+  text-decoration: none;
+  color: rgb(20, 20, 20);
+  font-weight: bold;
+}
+
+.breadcrumb span {
+  margin: 0 5px;
+  color: gray;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
 }
 </style>

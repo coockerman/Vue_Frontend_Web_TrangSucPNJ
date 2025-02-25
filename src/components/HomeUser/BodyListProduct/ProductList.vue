@@ -44,16 +44,20 @@ import ProductCard from '@/components/HomeUser/BodyListProduct/ProductCard.vue'
 const props = defineProps({
   products: Array,
   category: String,
+  itemsPerPage: {
+    type: Number,
+    default: 9, // Giá trị mặc định nếu không truyền vào
+  },
 })
 
-// Phân trang
-const itemsPerPage = 9
 const currentPage = ref(1)
 
-const totalPages = computed(() => Math.ceil(props.products.length / itemsPerPage))
+const totalPages = computed(() => Math.ceil(props.products.length / props.itemsPerPage))
 
-const startIndex = computed(() => (currentPage.value - 1) * itemsPerPage)
-const endIndex = computed(() => Math.min(startIndex.value + itemsPerPage, props.products.length))
+const startIndex = computed(() => (currentPage.value - 1) * props.itemsPerPage)
+const endIndex = computed(() =>
+  Math.min(startIndex.value + props.itemsPerPage, props.products.length)
+)
 
 const paginatedProducts = computed(() => props.products.slice(startIndex.value, endIndex.value))
 

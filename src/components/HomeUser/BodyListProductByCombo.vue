@@ -1,23 +1,21 @@
 <template>
   <div class="productPage">
-    <!-- Breadcrumb -->
     <nav class="breadcrumb">
       <router-link to="/user-home">Home</router-link>
       <span> > </span>
-      <span>Bộ sưu tập</span>
+      <span>Combo</span>
     </nav>
-
     <div class="imgCollection">
       <img :src="urlImage" alt="PNJ Banner" class="banner-img" />
     </div>
     <div class="product-list">
-      <ProductList :products="products" :category="collectionName" :itemsPerPage="6" />
+      <ProductList :products="products" :category="collectionName" :itemsPerPage="3" />
     </div>
   </div>
   <Footer />
 </template>
-  
-<script setup>
+    
+  <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
@@ -82,9 +80,9 @@ onMounted(() => {
   fetchProductsByCollection()
 })
 </script>
-
   
-<style scoped>
+    
+  <style scoped>
 .productPage {
   display: flex;
   flex-direction: column;
@@ -92,8 +90,8 @@ onMounted(() => {
   gap: 20px;
   max-width: 100%; /* Giới hạn chiều rộng */
   margin: 0 auto; /* Căn giữa theo chiều ngang */
-  padding: 0px 100px; /* Cách hai bên một khoảng nhỏ */
-  background-color: rgb(254, 215, 215);
+  padding: 0px 50px; /* Cách hai bên một khoảng nhỏ */
+  background-color: rgb(248, 227, 170);
 }
 
 .imgCollection {
@@ -145,5 +143,5 @@ onMounted(() => {
   text-decoration: underline;
 }
 </style>
-
   
+    

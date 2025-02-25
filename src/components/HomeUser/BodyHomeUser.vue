@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <Banner />
-    <ProductListBtn title="Trang sức" :products="jewelryProducts"/>
+    <ProductListBtn title="Trang sức" :products="jewelryProducts" />
     <ProductListBtn title="Trang sức cưới" :products="jewelryWeddingProducts" />
     <Promotion />
     <Footer />
@@ -82,6 +82,17 @@ export default {
         },
       ],
     }
+  },
+  mounted() {
+    // Khi trang load lại, kiểm tra nếu có vị trí cuộn cũ thì cuộn về đó
+    const savedScrollPosition = sessionStorage.getItem('scrollPosition')
+    if (savedScrollPosition) {
+      window.scrollTo(0, parseInt(savedScrollPosition)) // Cuộn về vị trí cũ
+    }
+  },
+  beforeUnmount() {
+    // Trước khi rời trang, lưu vị trí cuộn hiện tại vào sessionStorage
+    sessionStorage.setItem('scrollPosition', window.scrollY)
   },
 }
 </script>
