@@ -11,7 +11,9 @@
           alt="extra image"
           class="promotion-image-child"
         />
-        <button class="cta-button">{{ buttonText }}</button>
+        <router-link :to="{ path: customRoute, query: { id: idCollection } }">
+          <button class="cta-button">{{ buttonText }}</button>
+        </router-link>
       </div>
     </div>
   </div>
@@ -26,6 +28,11 @@ export default {
     image_child: String, // Thêm prop mới
     buttonText: String,
     reverse: Boolean,
+    idCollection: String,
+    customRoute: {
+      type: String,
+      default: '/user-home/productsByCollection', // Đường dẫn mặc định
+    },
   },
 }
 </script>
@@ -46,7 +53,7 @@ export default {
 }
 
 .promotion-image {
-  width: 55%;
+  width: 60%;
   height: 350px;
   border-radius: 10px;
   object-fit: cover;
@@ -81,7 +88,7 @@ p {
 }
 
 .promotion-image-child {
-  width: 150px;
+  width: 180px;
   height: auto;
   border-radius: 8px;
   margin-bottom: 10px; /* Tạo khoảng cách giữa ảnh và nút */

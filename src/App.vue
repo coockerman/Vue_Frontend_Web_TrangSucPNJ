@@ -1,6 +1,20 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import AuthenticationViewVue from './views/AuthenticationView.vue'
+import { onAuthStateChanged } from 'firebase/auth'
+import { useRouter } from 'vue-router'
+import { auth } from '@/firebase'
+
+const router = useRouter()
+
+// Kiểm tra trạng thái đăng nhập ngay khi ứng dụng khởi chạy
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    // Nếu chưa đăng nhập, chuyển về trang login
+    router.push('/authentication')
+  } else {
+    console.log('User is logged in:', user.email)
+    // Bạn có thể kiểm tra vai trò người dùng ở đây nếu cần
+  }
+})
 </script>
 
 <template>
@@ -14,10 +28,9 @@ import AuthenticationViewVue from './views/AuthenticationView.vue'
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
 
 .full-screen {
-  width: 100vw; /* Chiếm toàn bộ chiều rộng */
+  width: 100vw;
   justify-content: center;
   align-items: center;
-  background-color: #ffffff; /* Đảm bảo nền trắng */
+  background-color: #ffffff;
 }
 </style>
-

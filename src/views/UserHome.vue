@@ -1,17 +1,18 @@
 <template>
-  <div class="container">
+  <div class="user-home">
     <Navbar />
-    <BodyHomeUser />
+    <div class="content">
+      <router-view />
+    </div>
   </div>
 </template>
 
 <script>
 import Navbar from '@/components/HomeUser/NavbarForm.vue'
-import BodyHomeUser from '@/components/HomeUser/BodyHomeUser.vue'
+
 export default {
   components: {
     Navbar,
-    BodyHomeUser,
   },
 }
 </script>

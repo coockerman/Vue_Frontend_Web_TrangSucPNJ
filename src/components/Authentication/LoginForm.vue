@@ -1,7 +1,11 @@
 <template>
   <div class="login-form">
-    <h2 class="label-text">Welcome 👋</h2>
+    <h2 class="label-text">Welcome</h2>
     <p class="label-text3">Please login here</p>
+
+    <!-- Hiển thị thông báo lỗi -->
+    <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+
     <form @submit.prevent="handleLogin">
       <div class="input-group">
         <label class="label-text2">Email Address</label>
@@ -17,6 +21,7 @@
       </div>
       <button type="submit">Login</button>
     </form>
+
     <p class="register-link">
       Don't have an account?
       <a href="#" @click.prevent="$emit('toggle-form')">Sign up here</a>
@@ -28,23 +33,39 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { auth, database } from '@/firebase'
-import { signInWithEmailAndPassword } from 'firebase/auth'
+import {
+  signInWithEmailAndPassword,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence,
+  onAuthStateChanged,
+} from 'firebase/auth'
 import { ref as dbRef, get } from 'firebase/database'
 
 export default {
-  emits: ['toggle-form'],
-  setup(_, { emit }) {
+  setup() {
     const email = ref('')
     const password = ref('')
     const rememberMe = ref(false)
+    const errorMessage = ref('')
     const router = useRouter()
 
     const handleLogin = async () => {
+      errorMessage.value = ''
+
       try {
+        // Chọn cách lưu đăng nhập
+        await setPersistence(
+          auth,
+          rememberMe.value ? browserLocalPersistence : browserSessionPersistence
+        )
+
+        // Thực hiện đăng nhập
         const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value)
         const user = userCredential.user
 
-        const userRef = dbRef(database, `authentication/${user.uid}/Role`)
+        // Lấy role của user từ database
+        const userRef = dbRef(database, `users/${user.uid}/role`)
         const snapshot = await get(userRef)
 
         if (snapshot.exists()) {
@@ -55,14 +76,14 @@ export default {
             router.push('/user-home')
           }
         } else {
-          console.error('User role not found in database')
+          errorMessage.value = 'User role not found. Please contact support.'
         }
       } catch (error) {
-        console.error('Login failed:', error.message)
+        errorMessage.value = 'Tài khoản hoặc mật khẩu không đúng'
       }
     }
 
-    return { email, password, rememberMe, handleLogin }
+    return { email, password, rememberMe, errorMessage, handleLogin }
   },
 }
 </script>
@@ -161,6 +182,12 @@ button:hover {
   color: #000000;
   text-decoration: none;
   font-weight: bold;
+}
+
+.error-message {
+  color: red;
+  font-size: 14px;
+  margin-bottom: 10px;
 }
 
 .register-link a:hover {

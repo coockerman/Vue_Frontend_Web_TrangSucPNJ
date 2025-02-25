@@ -45,7 +45,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth'
 import { ref as dbRef, set } from 'firebase/database'
 
 export default {
-  setup() {
+  setup(_, { emit }) {
     const firstName = ref('')
     const lastName = ref('')
     const email = ref('')
@@ -69,15 +69,15 @@ export default {
         const user = userCredential.user
 
         // Lưu thông tin vào Firebase Database
-        await set(dbRef(database, `authentication/${user.uid}`), {
-          FirstName: firstName.value,
-          LastName: lastName.value,
-          Email: email.value,
-          Role: 'user', // Mặc định role là user
+        await set(dbRef(database, `users/${user.uid}`), {
+          firstName: firstName.value,
+          lastName: lastName.value,
+          email: email.value,
+          role: 'user', // Mặc định role là user
         })
 
         // Chuyển hướng đến trang đăng nhập sau khi đăng ký thành công
-        router.push('/login')
+        emit('toggle-form')
       } catch (error) {
         errorMessage.value = error.message
       }

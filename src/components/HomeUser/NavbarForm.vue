@@ -2,7 +2,9 @@
   <nav class="navbar">
     <!-- Logo -->
     <div class="logo">
-      <img src="/src/assets/Img/Logo.png" alt="PNJ" />
+      <router-link to="/user-home">
+        <img src="/src/assets/Img/Logo.png" alt="PNJ" />
+      </router-link>
     </div>
 
     <!-- Search Bar -->
@@ -10,9 +12,10 @@
 
     <!-- Menu Items -->
     <div class="menu">
-      <a href="#">TRANG SỨC</a>
-      <a href="#">GIFTS</a>
-      <a href="#">SALE</a>
+      <router-link to="#">TRANG SỨC</router-link>
+      <router-link to="#">GIFTS</router-link>
+      <router-link to="#">SALE</router-link>
+
       <!-- Nút giỏ hàng -->
       <div class="icon-wrapper">
         <button class="icon-button">
@@ -29,8 +32,8 @@
     </div>
   </nav>
 </template>
-  
-  <style scoped>
+
+<style scoped>
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -80,16 +83,16 @@
   width: 16px;
   height: 16px;
 }
+
 .icon-wrapper {
   position: relative;
-  width: 30px; /* Định kích thước khung */
+  width: 30px;
   height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: transparent; /* Làm nền trong suốt */
-  border: 2px solid rgb(86, 5, 5); /* Viền màu đỏ */
+  background: transparent;
+  border: 2px solid rgb(86, 5, 5);
 }
 </style>
-  
