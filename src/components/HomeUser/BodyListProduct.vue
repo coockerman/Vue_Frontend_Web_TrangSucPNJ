@@ -39,7 +39,7 @@ const activeFilters = ref({
 // Hàm lấy danh sách sản phẩm theo type
 const fetchProductsByType = async (type) => {
   try {
-    const response = await axios.get(`https://localhost:7241/api/products/by-type/${type}`)
+    const response = await axios.get(`https://localhost:5121/api/products/by-type/${type}`)
     return response.data.map((product) => ({
       id: product.id,
       name: product.nameProduct,
@@ -67,7 +67,10 @@ const fetchProducts = async () => {
   filteredProducts.value = allProducts.value
 }
 
-onMounted(fetchProducts)
+onMounted(() => {
+  fetchProducts()
+  window.scrollTo(0, 0)
+})
 watch(() => route.query.type, fetchProducts) // Theo dõi nếu type thay đổi
 
 // Áp dụng bộ lọc khi người dùng tìm kiếm

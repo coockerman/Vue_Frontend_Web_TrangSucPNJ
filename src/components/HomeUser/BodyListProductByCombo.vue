@@ -37,7 +37,7 @@ const fetchProductsByCollection = async () => {
   try {
     // 1️⃣ Gọi API lấy danh sách sản phẩm từ bộ sưu tập
     const collectionResponse = await axios.get(
-      `https://localhost:7241/api/collections/detail/${collectionId.value}`
+      `http://localhost:5121/api/collections/detail/${collectionId.value}`
     )
     urlImage.value = collectionResponse.data.urlImage
     collectionName.value = collectionResponse.data.name // Lưu tên bộ sưu tập
@@ -50,7 +50,7 @@ const fetchProductsByCollection = async () => {
 
     // 2️⃣ Gọi API lấy chi tiết sản phẩm theo list ID
     const productsResponse = await axios.post(
-      'https://localhost:7241/api/products/list-by-ids',
+      'http://localhost:5121/api/products/list-by-ids',
       productIds
     )
 
@@ -126,6 +126,7 @@ onMounted(() => {
   width: 80%; /* Đảm bảo breadcrumb trải dài toàn bộ chiều ngang */
   justify-content: flex-start; /* Căn về bên trái */
   padding-left: 5px; /* Tạo khoảng cách với mép trái */
+  font-family: 'Inter', sans-serif;
 }
 
 .breadcrumb a {
