@@ -8,7 +8,16 @@
       <input v-model="formData.nameProduct" required />
 
       <label>Loại:</label>
-      <input v-model="formData.category" required />
+      <select v-model="formData.type" required>
+        <option value="Bông tai">Bông tai</option>
+        <option value="Vòng lắc">Vòng lắc</option>
+        <option value="Nhẫn">Nhẫn</option>
+        <option value="Dây chuyền">Dây chuyền</option>
+        <option value="Kiềng">Kiềng</option>
+        <option value="Nhẫn cầu hôn">Nhẫn cầu hôn</option>
+        <option value="Nhẫn cặp">Nhẫn cặp</option>
+        <option value="Nhẫn cưới">Nhẫn cưới</option>
+      </select>
 
       <label>Mô tả:</label>
       <textarea v-model="formData.description"></textarea>
@@ -29,18 +38,18 @@
 
       <label>Karat:</label>
       <select v-model="formData.karat" required>
+        <option value="">null</option>
         <option value="10K">10K</option>
         <option value="14K">14K</option>
         <option value="18K">18K</option>
         <option value="24K">24K</option>
       </select>
 
-      <!-- <label>Hình ảnh:</label>
-      <input type="file" @change="uploadImage" multiple />
-      <div v-for="(link, index) in formData.productImg" :key="index">
-        <img :src="link" v-if="link" alt="Xem trước" class="preview-img" />
-        <button type="button" @click="removeImage(index)">Xóa</button>
-      </div> -->
+      <label>Hiển thị:</label>
+      <select v-model="formData.show" required>
+        <option value="true">Hiển thị</option>
+        <option value="false">Ẩn</option>
+      </select>
 
       <label>Hình ảnh:</label>
       <input type="file" @change="uploadImage" multiple />
@@ -92,7 +101,7 @@
       <tbody>
         <tr v-for="product in products" :key="product.id">
           <td>{{ product.nameProduct }}</td>
-          <td>{{ product.category }}</td>
+          <td>{{ product.type }}</td>
           <td>{{ product.gender }}</td>
           <td>
             <div v-for="(size, index) in product.sizePrice" :key="index">
@@ -127,13 +136,14 @@ export default {
       formData: {
         id: '',
         nameProduct: '',
-        category: '',
+        type: '',
         description: '',
         gender: '',
         material: '',
         karat: '',
         sizePrice: [{ size: 18, stock: 0, price: 0 }],
         productImg: [''], // Mảng link ảnh
+        show: '',
       },
       imageLink: '', // Lưu link nhập vào
       isEditing: false,
@@ -205,7 +215,7 @@ export default {
       this.formData = {
         id: '',
         nameProduct: '',
-        category: '',
+        type: '',
         description: '',
         gender: '',
         material: '',
