@@ -8,7 +8,7 @@
         <ProductList
           :products="filteredProducts"
           :category="route.query.type || 'Tất cả sản phẩm'"
-          :itemsPerPage="9"
+          :itemsPerPage="6"
         />
       </div>
     </div>
@@ -39,7 +39,7 @@ const activeFilters = ref({
 // Hàm lấy danh sách sản phẩm theo type
 const fetchProductsByType = async (type) => {
   try {
-    const response = await axios.get(`https://localhost:5121/api/products/by-type/${type}`)
+    const response = await axios.get(`http://localhost:5121/api/products/by-type/${type}`)
     return response.data.map((product) => ({
       id: product.id,
       name: product.nameProduct,

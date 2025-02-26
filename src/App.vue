@@ -1,20 +1,8 @@
 <script setup>
-import { onAuthStateChanged } from 'firebase/auth'
 import { useRouter } from 'vue-router'
-import { auth } from '@/firebase'
+import { auth } from '@/firebaseAuth'
 
 const router = useRouter()
-
-// Kiểm tra trạng thái đăng nhập ngay khi ứng dụng khởi chạy
-onAuthStateChanged(auth, (user) => {
-  if (!user) {
-    // Nếu chưa đăng nhập, chuyển về trang login
-    router.push('/authentication')
-  } else {
-    console.log('User is logged in:', user.email)
-    // Bạn có thể kiểm tra vai trò người dùng ở đây nếu cần
-  }
-})
 </script>
 
 <template>
