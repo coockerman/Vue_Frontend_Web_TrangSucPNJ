@@ -8,7 +8,16 @@
       <input v-model="formData.nameProduct" required />
 
       <label>Loại:</label>
-      <input v-model="formData.category" required />
+      <select v-model="formData.category" required>
+        <option value="Bông tai">Bông tai</option>
+        <option value="Vòng lắc">Vòng lắc</option>
+        <option value="Nhẫn">Nhẫn</option>
+        <option value="Dây chuyền">Dây chuyền</option>
+        <option value="Kiềng">Kiềng</option>
+        <option value="Nhẫn cầu hôn">Nhẫn cầu hôn</option>
+        <option value="Nhẫn cặp">Nhẫn cặp</option>
+        <option value="Nhẫn cưới">Nhẫn cưới</option>
+      </select>
 
       <label>Mô tả:</label>
       <textarea v-model="formData.description"></textarea>
@@ -34,13 +43,6 @@
         <option value="18K">18K</option>
         <option value="24K">24K</option>
       </select>
-
-      <!-- <label>Hình ảnh:</label>
-      <input type="file" @change="uploadImage" multiple />
-      <div v-for="(link, index) in formData.productImg" :key="index">
-        <img :src="link" v-if="link" alt="Xem trước" class="preview-img" />
-        <button type="button" @click="removeImage(index)">Xóa</button>
-      </div> -->
 
       <label>Hình ảnh:</label>
       <input type="file" @change="uploadImage" multiple />
