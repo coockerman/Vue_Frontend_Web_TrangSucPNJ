@@ -32,7 +32,7 @@
 <script>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { auth, database } from '@/firebase'
+import { auth, database } from '@/firebaseAuth'
 import {
   signInWithEmailAndPassword,
   setPersistence,
@@ -64,12 +64,18 @@ export default {
         const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value)
         const user = userCredential.user
 
+        // Lưu token vào localStorage
+        const idToken = await user.getIdToken() // Lấy token của Firebase
+        localStorage.setItem('userToken', idToken)
+
         // Lấy role của user từ database
         const userRef = dbRef(database, `users/${user.uid}/role`)
         const snapshot = await get(userRef)
 
         if (snapshot.exists()) {
           const role = snapshot.val()
+          localStorage.setItem('userRole', role) // Lưu role để sử dụng
+
           if (role === 'admin') {
             router.push('/admin-home')
           } else {

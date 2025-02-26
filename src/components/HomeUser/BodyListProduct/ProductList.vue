@@ -46,7 +46,7 @@ const props = defineProps({
   category: String,
   itemsPerPage: {
     type: Number,
-    default: 9, // Giá trị mặc định nếu không truyền vào
+    default: 6, // Giá trị mặc định nếu không truyền vào
   },
 })
 
