@@ -4,7 +4,9 @@ import App from './App.vue'
 import router from './router'
 import { auth } from '@/firebaseAuth'
 import { onAuthStateChanged } from 'firebase/auth'
+import { createPinia } from 'pinia'
 
+const pinia = createPinia() // ✅ Tạo một instance Pinia
 const app = createApp(App)
 
 onAuthStateChanged(auth, async (user) => {
@@ -16,5 +18,6 @@ onAuthStateChanged(auth, async (user) => {
   }
 })
 
+app.use(pinia) // ✅ Sử dụng instance đã tạo
 app.use(router)
 app.mount('#app')

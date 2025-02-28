@@ -1,5 +1,5 @@
 <template>
-  <div class="product-card">
+  <div class="product-card" @click="goToProductDetail">
     <!-- Hình ảnh sản phẩm -->
     <div class="image-container">
       <img :src="product.image" :alt="product.nameProduct" class="product-image" />
@@ -38,11 +38,22 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
 
 const props = defineProps({
   product: Object,
 })
+
+const router = useRouter()
+
+const goToProductDetail = () => {
+  console.log(props.product.id) // Kiểm tra ID trước khi chuyển trang
+  router.push({
+    name: 'productDetail',
+    query: { id: props.product.id },
+  })
+}
 
 const reviews = ref([])
 const reviewCount = computed(() => reviews.value.length)
@@ -51,7 +62,6 @@ const averageRating = computed(() => {
   return reviews.value.reduce((sum, review) => sum + (review.star || 0), 0) / reviewCount.value
 })
 
-// 🔹 Gọi API để lấy danh sách đánh giá từ danh sách ID
 const fetchReviews = async () => {
   if (!props.product.listEvaluationIds.length) return
 
@@ -60,7 +70,7 @@ const fetchReviews = async () => {
 
     const response = await axios.post(
       'http://localhost:5121/api/evaluations/list-by-ids',
-      props.product.listEvaluationIds, // Chỉ gửi mảng, không bọc trong { ids: [...] }
+      props.product.listEvaluationIds,
       { headers: { 'Content-Type': 'application/json' } }
     )
 
@@ -85,6 +95,12 @@ const formatPrice = (price) =>
   background: white;
   width: 240px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.product-card:hover {
+  transform: scale(1.05);
 }
 
 /* Hình ảnh và giảm giá */
