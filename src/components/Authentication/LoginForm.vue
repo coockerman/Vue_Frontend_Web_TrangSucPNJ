@@ -38,9 +38,9 @@ import {
   setPersistence,
   browserLocalPersistence,
   browserSessionPersistence,
-  onAuthStateChanged,
 } from 'firebase/auth'
 import { ref as dbRef, get } from 'firebase/database'
+import { useUserStore } from '@/stores/user'
 
 export default {
   setup() {
@@ -49,6 +49,7 @@ export default {
     const rememberMe = ref(false)
     const errorMessage = ref('')
     const router = useRouter()
+    const userStore = useUserStore() // 🔥 Đưa Pinia vào trong setup()
 
     const handleLogin = async () => {
       errorMessage.value = ''
@@ -65,7 +66,7 @@ export default {
         const user = userCredential.user
 
         // Lưu token vào localStorage
-        const idToken = await user.getIdToken() // Lấy token của Firebase
+        const idToken = await user.getIdToken()
         localStorage.setItem('userToken', idToken)
 
         // Lấy role của user từ database
@@ -76,6 +77,10 @@ export default {
           const role = snapshot.val()
           localStorage.setItem('userRole', role) // Lưu role để sử dụng
 
+          // 🔥 Cập nhật user vào store
+          userStore.setUser({ uid: user.uid, role: role })
+
+          // Điều hướng theo vai trò
           if (role === 'admin') {
             router.push('/admin-home')
           } else {
@@ -93,6 +98,7 @@ export default {
   },
 }
 </script>
+
 
 
 

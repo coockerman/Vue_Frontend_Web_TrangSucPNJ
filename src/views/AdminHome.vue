@@ -3,9 +3,18 @@
     <aside class="sidebar">
       <h2>Admin Panel</h2>
       <ul>
-        <li @click="navigate('accounts')">Quản lý tài khoản</li>
-        <li @click="navigate('')">Quản lý sản phẩm</li>
-        <li @click="navigate('orders')">Quản lý đơn hàng</li>
+        <router-link :to="'/admin-home/'">
+          <li>Quản lý tài khoản</li>
+        </router-link>
+
+        <router-link :to="'/admin-home/managerProduct/'">
+          <li>Quản lý sản phẩm</li>
+        </router-link>
+
+        <router-link :to="'/admin-home/managerOrder/'">
+          <li>Quản lý đơn hàng</li>
+        </router-link>
+
         <li @click="navigate('revenue')">Xem doanh thu</li>
         <li @click="navigate('reviews')">Quản lý đánh giá</li>
         <li @click="navigate('ads')">Quản lý quảng cáo</li>
@@ -21,7 +30,7 @@
         </div>
       </header>
       <div class="page-content">
-        <BodyManagerProduct />
+        <router-view />
       </div>
     </main>
   </div>

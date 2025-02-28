@@ -7,6 +7,9 @@ import BodyListProduct from '@/components/HomeUser/BodyListProduct.vue'
 import BodyListProductByCollection from '@/components/HomeUser/BodyListProductByCollection.vue'
 import BodyListProductByCombo from '@/components/HomeUser/BodyListProductByCombo.vue'
 import BodyManagerProduct from '@/components/HomeAdmin/BodyManagerProduct.vue'
+import BodyAdminTitle from '@/components/HomeAdmin/BodyAdminTitle.vue'
+import BodyManagerOrder from '@/components/HomeAdmin/BodyManagerOrder.vue'
+import BodyProductDetail from '@/components/HomeUser/BodyProductDetail.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,9 +29,19 @@ const router = createRouter({
       component: AdminHome,
       children: [
         {
-          path: '',
+          path: 'managerProduct',
           name: 'managerProduct',
           component: BodyManagerProduct,
+        },
+        {
+          path: '',
+          name: 'adminTitle',
+          component: BodyAdminTitle,
+        },
+        {
+          path: 'managerOrder',
+          name: 'managerOrder',
+          component: BodyManagerOrder,
         },
       ],
     },
@@ -56,6 +69,11 @@ const router = createRouter({
           path: 'productsByCombo',
           name: 'productListByCombo',
           component: BodyListProductByCombo, // Không cần đăng nhập
+        },
+        {
+          path: 'productDetail:/id',
+          name: 'productDetail',
+          component: BodyProductDetail, // Không cần đăng nhập
         },
       ],
     },

@@ -1,8 +1,12 @@
 <template>
   <div class="auth-container">
-    <div class="logo-section">
-      <img src="@/assets/Img/Logo.png" alt="PNJ Logo" class="logo" />
-    </div>
+    <router-link :to="'/user-home'" class="logo-section">
+      <h2>Trang chủ</h2>
+      <div>
+        <img src="@/assets/Img/Logo.png" alt="PNJ Logo" class="logo" />
+      </div>
+    </router-link>
+
     <LoginForm v-if="isLogin" @toggle-form="toggleForm" />
     <RegisterForm v-else @toggle-form="toggleForm" />
   </div>
@@ -40,7 +44,6 @@ export default {
 
 .logo-section {
   flex: 1;
-  display: flex;
   justify-content: center;
   align-items: center;
 }
