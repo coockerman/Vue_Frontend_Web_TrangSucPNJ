@@ -2,40 +2,81 @@
   <div class="product-card">
     <!-- Hình ảnh sản phẩm -->
     <div class="image-container">
-      <img :src="product.image" :alt="product.name" class="product-image" />
+      <img :src="product.image" :alt="product.nameProduct" class="product-image" />
       <span v-if="product.discount" class="discount-badge">-{{ product.discount }}%</span>
     </div>
 
     <!-- Tên sản phẩm -->
-    <h3 class="product-name">{{ product.name }}</h3>
+    <h3 class="product-name">{{ product.nameProduct }}</h3>
 
     <!-- Đánh giá -->
     <div class="rating">
       <span class="stars">
-        <span v-for="star in Math.floor(product.rating)" :key="star">⭐</span>
-        <span v-if="product.rating % 1 !== 0">☆</span>
+        <span v-for="star in Math.floor(averageRating)" :key="star">⭐</span>
+        <span v-if="averageRating % 1 !== 0">☆</span>
       </span>
-      <span class="rating-score">{{ product.rating }}/5</span>
+      <span class="rating-score">
+        {{
+          reviewCount > 0
+            ? `${averageRating.toFixed(1)}/5 (${reviewCount} đánh giá)`
+            : 'Chưa có đánh giá'
+        }}
+      </span>
     </div>
 
     <!-- Giá sản phẩm -->
+    <div class="discount-container">
+      <span class="old-price">{{ formatPrice(product.price * 1.2) }}</span>
+      <span class="discount-text">Giảm 20%</span>
+    </div>
     <div class="price-container">
       <span v-if="product.oldPrice" class="old-price">{{ formatPrice(product.oldPrice) }}</span>
       <span class="price">{{ formatPrice(product.price) }}</span>
     </div>
   </div>
 </template>
-  
-  <script setup>
-defineProps({
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import axios from 'axios'
+
+const props = defineProps({
   product: Object,
 })
+
+const reviews = ref([])
+const reviewCount = computed(() => reviews.value.length)
+const averageRating = computed(() => {
+  if (reviewCount.value === 0) return 0
+  return reviews.value.reduce((sum, review) => sum + (review.star || 0), 0) / reviewCount.value
+})
+
+// 🔹 Gọi API để lấy danh sách đánh giá từ danh sách ID
+const fetchReviews = async () => {
+  if (!props.product.listEvaluationIds.length) return
+
+  try {
+    console.log('📌 Danh sách ID gửi đi:', JSON.stringify(props.product.listEvaluationIds))
+
+    const response = await axios.post(
+      'http://localhost:5121/api/evaluations/list-by-ids',
+      props.product.listEvaluationIds, // Chỉ gửi mảng, không bọc trong { ids: [...] }
+      { headers: { 'Content-Type': 'application/json' } }
+    )
+
+    reviews.value = response.data
+  } catch (error) {
+    console.error('❌ Lỗi khi lấy đánh giá:', error.response ? error.response.data : error.message)
+  }
+}
+
+onMounted(fetchReviews)
 
 const formatPrice = (price) =>
   new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)
 </script>
-  
-  <style scoped>
+
+<style scoped>
 .product-card {
   border: 1px solid #ddd;
   padding: 15px;
@@ -107,5 +148,25 @@ const formatPrice = (price) =>
   font-weight: bold;
   color: #d9534f;
 }
+
+/* Giá gốc bị gạch */
+.discount-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 4px;
+}
+
+.old-price {
+  text-decoration: line-through;
+  color: gray;
+  font-size: 14px;
+}
+
+.discount-text {
+  color: red;
+  font-size: 14px;
+  font-weight: bold;
+}
 </style>
-  

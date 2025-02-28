@@ -58,18 +58,24 @@ const fetchProductsByCollection = async () => {
 
     // 3️⃣ Chuẩn hóa dữ liệu sản phẩm
     products.value = productsResponse.data.map((product) => ({
-      id: product.id,
-      name: product.nameProduct,
-      price: product.sizePrice.length > 0 ? product.sizePrice[0].price : 0,
-      rating:
-        product.listEvaluation.length > 0
-          ? product.listEvaluation.reduce((sum, e) => sum + e.rating, 0) /
-            product.listEvaluation.length
+      id: product.id || null,
+      nameProduct: product.nameProduct || 'Sản phẩm chưa có tên',
+      price:
+        Array.isArray(product.sizePrice) && product.sizePrice.length > 0
+          ? product.sizePrice[0].price
           : 0,
-      material: product.material,
-      karat: product.karat,
-      gender: product.gender,
-      image: product.productImg.length > 0 ? product.productImg[0] : '/src/assets/Img/Logo.png',
+      oldPrice: product.oldPrice || null,
+      discount: product.discount || 0,
+      listEvaluationIds: Array.isArray(product.listEvaluation)
+        ? product.listEvaluation.map((ev) => (typeof ev === 'string' ? ev : ev.id))
+        : [], // 🔹 Đảm bảo chỉ lấy ID nếu là mảng đối tượng
+      material: product.material || 'Không xác định',
+      karat: product.karat || 'Không có',
+      gender: product.gender || 'Unisex',
+      image:
+        Array.isArray(product.productImg) && product.productImg.length > 0
+          ? product.productImg[0]
+          : '/src/assets/Img/Logo.png',
     }))
   } catch (error) {
     console.error('Lỗi khi lấy sản phẩm từ bộ sưu tập:', error)
