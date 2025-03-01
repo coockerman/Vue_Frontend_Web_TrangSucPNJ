@@ -12,7 +12,7 @@
 
     <!-- Menu Items -->
     <div class="menu">
-      <router-link to="#">TRANG SỨC</router-link>
+      <router-link :to="`/user-home/products`"> TRANG SỨC </router-link>
       <router-link to="#">GIFTS</router-link>
       <router-link to="#">SALE</router-link>
 
@@ -29,7 +29,11 @@
         <!-- Bảng chọn -->
         <div class="dropdown">
           <template v-if="isLoggedIn">
-            <button @click="goToProfile">Thông tin cá nhân</button>
+            <button>
+              <router-link class="text-normal" :to="'/user-home/userProfile'"
+                >Thông tin cá nhân</router-link
+              >
+            </button>
             <button @click="logout">Đăng xuất</button>
           </template>
           <template v-else>
@@ -208,6 +212,10 @@ const goToLogin = () => {
 
 .dropdown button:hover {
   background: #f5f5f5;
+}
+.text-normal {
+  font-size: 10px;
+  color: black;
 }
 </style>
 

@@ -3,7 +3,7 @@
   <nav class="breadcrumb">
     <router-link to="/user-home">Home</router-link>
     <span> > </span>
-    <span>Bộ sưu tập</span>
+    <span>Trang sức</span>
   </nav>
   <div class="filter-sidebar">
     <h3 class="filter-title">Lọc</h3>
@@ -15,7 +15,7 @@
         type="range"
         v-model="price"
         min="0"
-        max="200000000"
+        max="50000000"
         step="1000000"
         class="price-slider"
         @input="applyFilters"
@@ -79,7 +79,7 @@
 <script setup>
 import { ref, defineEmits } from 'vue'
 
-const price = ref(200000000)
+const price = ref(50000000)
 const material = ref('all')
 const karat = ref('all')
 const gender = ref('all')

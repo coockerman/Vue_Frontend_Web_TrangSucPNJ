@@ -4,12 +4,8 @@
     <p class="label-text3">Please enter details</p>
     <form @submit.prevent="handleRegister">
       <div class="input-group">
-        <label class="label-text2">First Name</label>
-        <input type="text" v-model="firstName" required placeholder="Enter your first name" />
-      </div>
-      <div class="input-group">
-        <label class="label-text2">Last Name</label>
-        <input type="text" v-model="lastName" required placeholder="Enter your last name" />
+        <label class="label-text2">Full Name</label>
+        <input type="text" v-model="fullName" required placeholder="Enter your first name" />
       </div>
       <div class="input-group">
         <label class="label-text2">Email Address</label>
@@ -46,8 +42,7 @@ import { ref as dbRef, set } from 'firebase/database'
 
 export default {
   setup(_, { emit }) {
-    const firstName = ref('')
-    const lastName = ref('')
+    const fullName = ref('')
     const email = ref('')
     const password = ref('')
     const agreeToTerms = ref(false)
@@ -70,8 +65,7 @@ export default {
 
         // Lưu thông tin vào Firebase Database
         await set(dbRef(database, `users/${user.uid}`), {
-          firstName: firstName.value,
-          lastName: lastName.value,
+          fullName: fullName.value,
           email: email.value,
           role: 'user', // Mặc định role là user
         })
@@ -83,7 +77,7 @@ export default {
       }
     }
 
-    return { firstName, lastName, email, password, agreeToTerms, handleRegister, errorMessage }
+    return { fullName, email, password, agreeToTerms, handleRegister, errorMessage }
   },
 }
 </script>

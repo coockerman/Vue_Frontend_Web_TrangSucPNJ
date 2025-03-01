@@ -1,14 +1,16 @@
 <template>
-  <footer class="footer-container">
+  <footer class="footer-container" v-if="adminData">
     <div class="footer-content">
       <!-- Cột 1: Logo & Thông tin công ty -->
       <div class="footer-col-big">
         <img src="@/assets/Img/Logo.png" alt="PNJ Logo" class="footer-logo" />
-        <p>© 2017 Công Ty Cổ Phần Vàng Bạc Đá Quý Phú Nhuận</p>
-        <p>170E Phan Đăng Lưu, P.4, Q.Phú Nhuận, TP.Hồ Chí Minh</p>
-        <p>ĐT: 028 39951703 - Fax: 028 3995 1702</p>
-        <p>Giấy chứng nhận ĐKKD: 0300521758</p>
-        <p>Tổng đài hỗ trợ (08:00-21:00): <strong>1800545457</strong></p>
+        <p>© 2017 {{ adminData.nameShop }}</p>
+        <p>{{ adminData.address }}</p>
+        <p>ĐT: {{ adminData.numberPhone }} - Fax: {{ adminData.fax }}</p>
+        <p>Giấy chứng nhận ĐKKD: {{ adminData.business }}</p>
+        <p>
+          Tổng đài hỗ trợ (08:00-21:00): <strong>{{ adminData.complaint }}</strong>
+        </p>
       </div>
 
       <!-- Cột 2: Về PNJ -->
@@ -66,6 +68,23 @@
     </div>
   </footer>
 </template>
+<script setup>
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+
+const adminData = ref(null)
+
+onMounted(async () => {
+  try {
+    const response = await axios.get('http://localhost:5121/api/admin-titles/all')
+    if (response.data.length > 0) {
+      adminData.value = response.data[0] // Lấy phần tử đầu tiên
+    }
+  } catch (error) {
+    console.error('Lỗi khi lấy dữ liệu AdminTitle:', error)
+  }
+})
+</script>
 
 <style scoped>
 .footer-container {

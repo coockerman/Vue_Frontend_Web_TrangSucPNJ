@@ -8,7 +8,7 @@
         <ProductList
           :products="filteredProducts"
           :category="route.query.type || 'Tất cả sản phẩm'"
-          :itemsPerPage="6"
+          :itemsPerPage="route.query.type ? 6 : 12"
         />
       </div>
     </div>
@@ -40,40 +40,74 @@ const fetchProductsByType = async (type) => {
   try {
     const response = await axios.get(`http://localhost:5121/api/products/by-type/${type}`)
 
-    return response.data.map((product) => {
-      console.log('📌 Kiểm tra listEvaluation:', product.listEvaluation)
+    return response.data
+      .filter((product) => product.show !== 'false') // 🔹 Lọc bỏ sản phẩm có show = 'false'
+      .map((product) => {
+        console.log('📌 Kiểm tra listEvaluation:', product.listEvaluation)
 
-      return {
-        id: product.id || null,
-        nameProduct: product.nameProduct || 'Sản phẩm chưa có tên',
-        price:
-          Array.isArray(product.sizePrice) && product.sizePrice.length > 0
-            ? product.sizePrice[0].price
-            : 0,
-        oldPrice: product.oldPrice || null,
-        discount: product.discount || 0,
-        listEvaluationIds: Array.isArray(product.listEvaluation)
-          ? product.listEvaluation.map((ev) => (typeof ev === 'string' ? ev : ev.id))
-          : [], // 🔹 Đảm bảo chỉ lấy ID nếu là mảng đối tượng
-        material: product.material || 'Không xác định',
-        karat: product.karat || 'Không có',
-        gender: product.gender || 'Unisex',
-        image:
-          Array.isArray(product.productImg) && product.productImg.length > 0
-            ? product.productImg[0]
-            : '/src/assets/Img/Logo.png',
-      }
-    })
+        return {
+          id: product.id || null,
+          nameProduct: product.nameProduct || 'Sản phẩm chưa có tên',
+          price:
+            Array.isArray(product.sizePrice) && product.sizePrice.length > 0
+              ? product.sizePrice[0].price
+              : 0,
+          oldPrice: product.oldPrice || null,
+          discount: product.discount || 0,
+          listEvaluationIds: Array.isArray(product.listEvaluation)
+            ? product.listEvaluation.map((ev) => (typeof ev === 'string' ? ev : ev.id))
+            : [],
+          material: product.material || 'Không xác định',
+          karat: product.karat || 'Không có',
+          gender: product.gender || 'Unisex',
+          image:
+            Array.isArray(product.productImg) && product.productImg.length > 0
+              ? product.productImg[0]
+              : '/src/assets/Img/Logo.png',
+        }
+      })
   } catch (error) {
     console.error('❌ Lỗi khi lấy sản phẩm theo loại:', error)
     return []
   }
 }
 
-// Gọi API khi component được mount hoặc type thay đổi
 const fetchProducts = async () => {
-  const type = route.query.type || 'all'
-  allProducts.value = await fetchProductsByType(type)
+  const type = route.query.type || null // Nếu không có type, đặt là null
+
+  if (type) {
+    allProducts.value = await fetchProductsByType(type)
+  } else {
+    try {
+      const response = await axios.get('http://localhost:5121/api/products/all')
+      allProducts.value = response.data
+        .filter((product) => product.show !== 'false')
+        .map((product) => ({
+          id: product.id || null,
+          nameProduct: product.nameProduct || 'Sản phẩm chưa có tên',
+          price:
+            Array.isArray(product.sizePrice) && product.sizePrice.length > 0
+              ? product.sizePrice[0].price
+              : 0,
+          oldPrice: product.oldPrice || null,
+          discount: product.discount || 0,
+          listEvaluationIds: Array.isArray(product.listEvaluation)
+            ? product.listEvaluation.map((ev) => (typeof ev === 'string' ? ev : ev.id))
+            : [],
+          material: product.material || 'Không xác định',
+          karat: product.karat || 'Không có',
+          gender: product.gender || 'Unisex',
+          image:
+            Array.isArray(product.productImg) && product.productImg.length > 0
+              ? product.productImg[0]
+              : '/src/assets/Img/Logo.png',
+        }))
+    } catch (error) {
+      console.error('❌ Lỗi khi lấy tất cả sản phẩm:', error)
+      allProducts.value = []
+    }
+  }
+
   filteredProducts.value = allProducts.value
 }
 
