@@ -1,7 +1,16 @@
 <template>
   <div v-if="product" class="product-detail">
     <nav class="breadcrumb">
-      <span>Home</span> > <span>{{ product.category }}</span> >
+      <span><router-link class="user-home-text" to="/user-home">Home</router-link></span> >
+      <span>
+        <router-link
+          class="type-text"
+          :to="`/user-home/products?type=${encodeURIComponent(product.type)}`"
+        >
+          {{ product.type }}
+        </router-link>
+      </span>
+      >
       <span class="current">{{ product.nameProduct }}</span>
     </nav>
 
@@ -533,6 +542,15 @@ const scrollThumbnails = (event) => {
   font-size: 14px;
   color: #666;
   margin-top: 4px;
+}
+
+.user-home-text {
+  color: black;
+  font-weight: bold;
+}
+.type-text {
+  color: rgb(64, 64, 64);
+  font-weight: bold;
 }
 </style>
 

@@ -7,6 +7,7 @@ import BodyListProduct from '@/components/HomeUser/BodyListProduct.vue'
 import BodyListProductByCollection from '@/components/HomeUser/BodyListProductByCollection.vue'
 import BodyListProductByCombo from '@/components/HomeUser/BodyListProductByCombo.vue'
 import BodyManagerProduct from '@/components/HomeAdmin/BodyManagerProduct.vue'
+import BodyUserProfile from '@/components/HomeUser/BodyUserProfile.vue'
 import BodyAdminTitle from '@/components/HomeAdmin/BodyAdminTitle.vue'
 import BodyManagerOrder from '@/components/HomeAdmin/BodyManagerOrder.vue'
 import BodyProductDetail from '@/components/HomeUser/BodyProductDetail.vue'
@@ -27,6 +28,7 @@ const router = createRouter({
       path: '/admin-home',
       name: 'adminHome',
       component: AdminHome,
+      meta: { requireRole: true },
       children: [
         {
           path: 'managerProduct',
@@ -75,6 +77,12 @@ const router = createRouter({
           name: 'productDetail',
           component: BodyProductDetail, // Không cần đăng nhập
         },
+        {
+          path: 'userProfile',
+          name: 'userProfile',
+          component: BodyUserProfile,
+          meta: { requiresAuth: true },
+        },
       ],
     },
   ],
@@ -82,11 +90,17 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('userToken')
+  const role = localStorage.getItem('userRole')
+
   if (to.matched.some((record) => record.meta.requiresAuth) && !token) {
-    next('/authentication')
-  } else {
-    next()
+    return next('/authentication') // Không có token thì về trang đăng nhập
   }
+
+  if (to.matched.some((record) => record.meta.requireRole) && role !== 'admin') {
+    return next('/authentication') // Không phải admin thì về trang đăng nhập
+  }
+
+  next() // Chỉ gọi next() một lần duy nhất nếu không có điều kiện nào bị chặn
 })
 
 export default router

@@ -90,7 +90,22 @@ export default {
           errorMessage.value = 'User role not found. Please contact support.'
         }
       } catch (error) {
-        errorMessage.value = 'Tài khoản hoặc mật khẩu không đúng'
+        switch (error.code) {
+          case 'auth/invalid-email':
+            errorMessage.value = 'Email không hợp lệ.'
+            break
+          case 'auth/user-not-found':
+            errorMessage.value = 'Tài khoản không tồn tại.'
+            break
+          case 'auth/wrong-password':
+            errorMessage.value = 'Mật khẩu không đúng.'
+            break
+          case 'auth/too-many-requests':
+            errorMessage.value = 'Bạn đã nhập sai quá nhiều lần, thử lại sau.'
+            break
+          default:
+            errorMessage.value = 'Đăng nhập thất bại. Vui lòng thử lại.'
+        }
       }
     }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="product-card" @click="goToProductDetail">
+  <div class="product-card" v-if="product.show !== 'false'" @click="goToProductDetail">
     <!-- Hình ảnh sản phẩm -->
     <div class="image-container">
       <img :src="product.image" :alt="product.nameProduct" class="product-image" />
