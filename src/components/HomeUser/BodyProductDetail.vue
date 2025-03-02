@@ -81,7 +81,7 @@
           <button @click="decreaseQuantity">-</button>
           <span>{{ quantity }}</span>
           <button @click="increaseQuantity">+</button>
-          <div class="cart-btn">Thêm vào giỏ hàng</div>
+          <div @click="addToCard" class="cart-btn">Thêm vào giỏ hàng</div>
         </div>
       </div>
     </div>
@@ -141,6 +141,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
+import { useUserStore } from '@/stores/user'
 import ProductTitle from './BodyProductDetail/ProductTitle.vue'
 import EvaluationList from './BodyProductDetail/EvaluationList.vue'
 import { toRaw } from 'vue'
@@ -151,7 +152,7 @@ const selectedSize = ref(null)
 const selectedSizePrice = ref(0)
 const quantity = ref(1)
 const activeTab = ref('description')
-
+const userStore = useUserStore()
 const reviews = ref([]) // Danh sách đánh giá từ API
 const reviewCount = computed(() => reviews.value.length)
 const averageRating = computed(() => {
@@ -230,6 +231,36 @@ const scrollThumbnails = (event) => {
   const container = thumbnailContainer.value
   if (container) {
     container.scrollTop += event.deltaY
+  }
+}
+const addToCard = async () => {
+  try {
+    if (!userStore.uid) {
+      alert('Bạn cần đăng nhập trước khi thêm sản phẩm vào giỏ hàng.')
+      return
+    }
+
+    const formData = {
+      idProduct: route.query.id,
+      size: selectedSize.value,
+      stock: quantity.value, // Đảm bảo quantity.value có dữ liệu hợp lệ
+    }
+
+    const link = `http://localhost:5121/api/users/${userStore.uid}/shopping-cart/add` // Dùng backtick
+    console.log(link) // Debug link
+
+    const response = await fetch(link, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    })
+
+    if (!response.ok) throw new Error('Lỗi khi thêm sản phẩm vào giỏ hàng')
+
+    alert('Thêm sản phẩm vào giỏ hàng thành công!')
+  } catch (error) {
+    console.error(error)
+    alert('Có lỗi xảy ra, vui lòng thử lại.')
   }
 }
 </script>

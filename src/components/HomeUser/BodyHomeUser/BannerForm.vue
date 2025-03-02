@@ -50,7 +50,7 @@ export default {
     startAutoSlide() {
       setInterval(() => {
         this.nextSlide()
-      }, 10000)
+      }, 3000)
     },
     scrollToBottom() {
       window.scrollBy({ top: window.innerHeight * 1.1, behavior: 'smooth' })
