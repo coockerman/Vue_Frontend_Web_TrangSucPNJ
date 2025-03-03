@@ -71,6 +71,7 @@ const goToProfile = () => {
 
 const logout = () => {
   localStorage.removeItem('userToken') // Xóa token đăng nhập
+  localStorage.removeItem('userRole')
   isLoggedIn.value = false
   router.push('/authentication') // Quay về trang đăng nhập
   dropdownOpen.value = false

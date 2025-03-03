@@ -26,6 +26,7 @@
       </div>
     </div>
   </div>
+  <Footer />
 </template>
     
   <script setup>
@@ -34,14 +35,15 @@ import { useRouter } from 'vue-router'
 import UserInfo from '@/components/HomeUser/BodyUserProfile/UserInfo.vue'
 import EditUser from '@/components/HomeUser/BodyUserProfile/EditUser.vue'
 import UserAddress from '@/components/HomeUser/BodyUserProfile/UserAddress.vue'
+import Footer from '@/components/HomeUser/BodyHomeUser/FooterForm.vue'
 
 const router = useRouter()
 const selectedTab = ref('view')
 
 const menuItems = [
-  { id: 'view', label: 'Profile', icon: 'fa fa-user' },
-  { id: 'edit', label: 'Edit profile', icon: 'fa fa-pencil-alt' },
-  { id: 'address', label: 'Address', icon: 'fa fa-bell' },
+  { id: 'view', label: 'Thông tin', icon: 'fa fa-user' },
+  { id: 'edit', label: 'Sửa thông tin', icon: 'fa fa-pencil-alt' },
+  { id: 'address', label: 'Địa chỉ', icon: 'fa fa-bell' },
   { id: 'security', label: 'Security', icon: 'fa fa-lock' },
   { id: 'appearance', label: 'Appearance', icon: 'fa fa-cog' },
   { id: 'help', label: 'Help', icon: 'fa fa-question-circle' },
@@ -65,6 +67,7 @@ const goHome = () => {
 
 .user-dashboard {
   display: flex;
+  min-height: 450px;
   width: 80%;
   max-width: 1500px;
   background: white;

@@ -12,6 +12,8 @@ import BodyAdminTitle from '@/components/HomeAdmin/BodyAdminTitle.vue'
 import BodyManagerOrder from '@/components/HomeAdmin/BodyManagerOrder.vue'
 import BodyProductDetail from '@/components/HomeUser/BodyProductDetail.vue'
 import BodyCartView from '@/components/HomeUser/BodyCartView.vue'
+import BodyPayment from '@/components/HomeUser/BodyPayment.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -90,6 +92,12 @@ const router = createRouter({
           component: BodyCartView,
           meta: { requiresAuth: true },
         },
+        {
+          path: 'payment',
+          name: 'payment',
+          component: BodyPayment,
+          meta: { requiresAuth: true },
+        },
       ],
     },
   ],
@@ -107,8 +115,8 @@ router.beforeEach((to, from, next) => {
     return next('/authentication') // Không phải admin thì về trang đăng nhập
   }
 
-  if (to.matched.some((record) => record.meta.requireRoleUser) && role !== 'user') {
-    return next('/authentication') // Không phải admin thì về trang đăng nhập
+  if (to.matched.some((record) => record.meta.requireRoleUser) && role == 'admin') {
+    return next('/admin-home') // Không phải user thì về trang đăng nhập
   }
 
   next() // Chỉ gọi next() một lần duy nhất nếu không có điều kiện nào bị chặn

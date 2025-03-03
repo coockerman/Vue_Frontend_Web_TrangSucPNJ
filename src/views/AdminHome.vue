@@ -54,6 +54,7 @@ export default {
     },
     logout() {
       localStorage.removeItem('userToken')
+      localStorage.removeItem('userRole')
       this.$router.push('/authentication')
     },
     navigate(route) {

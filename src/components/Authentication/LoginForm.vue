@@ -76,7 +76,7 @@ export default {
         if (snapshot.exists()) {
           const role = snapshot.val()
           localStorage.setItem('userRole', role) // Lưu role để sử dụng
-
+          localStorage.setItem('uid', user.uid)
           // 🔥 Cập nhật user vào store
           userStore.setUser({ uid: user.uid, role: role })
 

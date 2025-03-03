@@ -66,7 +66,9 @@
         </div>
 
         <!-- Nút Thanh toán -->
-        <button class="checkout-btn">Thanh toán ngay →</button>
+        <router-link class="text-normal" :to="'/user-home/payment'">
+          <button class="checkout-btn">Thanh toán ngay →</button></router-link
+        >
       </div>
     </div>
   </div>
@@ -76,11 +78,9 @@
   
   <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useUserStore } from '@/stores/user'
 import axios from 'axios'
 import Footer from '@/components/HomeUser/BodyHomeUser/FooterForm.vue'
 
-const userStore = useUserStore()
 const cartItems = ref([])
 const products = ref({})
 
@@ -88,7 +88,7 @@ const products = ref({})
 const fetchCart = async () => {
   try {
     const response = await axios.get(
-      `http://localhost:5121/api/users/${userStore.uid}/shopping-cart`
+      `http://localhost:5121/api/users/${localStorage.getItem('uid')}/shopping-cart`
     )
     cartItems.value = Array.isArray(response.data) ? response.data : []
   } catch (error) {
@@ -116,7 +116,9 @@ const updateProductShoppingCart = async (idCart, idProduct, size, stock) => {
       stock: stock,
     }
     console.log('Sending data:', updateData)
-    const link = `http://localhost:5121/api/users/${userStore.uid}/shopping-cart/update/${idCart}`
+    const link = `http://localhost:5121/api/users/${localStorage.getItem(
+      'uid'
+    )}/shopping-cart/update/${idCart}`
     console.log(link)
     const response = await fetch(link, {
       method: 'PUT',
@@ -133,7 +135,9 @@ const updateProductShoppingCart = async (idCart, idProduct, size, stock) => {
 }
 const deleteProductShoppingCart = async (idCart) => {
   try {
-    const link = `http://localhost:5121/api/users/${userStore.uid}/shopping-cart/remove/${idCart}`
+    const link = `http://localhost:5121/api/users/${localStorage.getItem(
+      'uid'
+    )}/shopping-cart/remove/${idCart}`
     const response = await fetch(link, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },

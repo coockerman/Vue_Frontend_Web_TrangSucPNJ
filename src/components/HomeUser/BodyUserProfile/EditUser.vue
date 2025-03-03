@@ -36,18 +36,18 @@
 </template>
   
   <script>
-import { useUserStore } from '@/stores/user'
 import { ref, onMounted } from 'vue'
 
 export default {
   setup() {
-    const userStore = useUserStore()
     const user = ref({})
 
     // Fetch user data
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`http://localhost:5121/api/users/detail/${userStore.uid}`)
+        const response = await fetch(
+          `http://localhost:5121/api/users/detail/${localStorage.getItem('uid')}`
+        )
         if (!response.ok) throw new Error('Lỗi khi lấy dữ liệu')
         user.value = await response.json()
       } catch (error) {
@@ -68,7 +68,7 @@ export default {
         }
 
         const response = await fetch(
-          `http://localhost:5121/api/users/update-info/${userStore.uid}`,
+          `http://localhost:5121/api/users/update-info/${localStorage.getItem('uid')}`,
           {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },

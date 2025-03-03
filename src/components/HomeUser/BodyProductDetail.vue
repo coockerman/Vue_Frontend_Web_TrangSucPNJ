@@ -141,10 +141,9 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
-import { useUserStore } from '@/stores/user'
 import ProductTitle from './BodyProductDetail/ProductTitle.vue'
 import EvaluationList from './BodyProductDetail/EvaluationList.vue'
-import { toRaw } from 'vue'
+
 const route = useRoute()
 const product = ref(null)
 const mainImage = ref('')
@@ -152,7 +151,6 @@ const selectedSize = ref(null)
 const selectedSizePrice = ref(0)
 const quantity = ref(1)
 const activeTab = ref('description')
-const userStore = useUserStore()
 const reviews = ref([]) // Danh sách đánh giá từ API
 const reviewCount = computed(() => reviews.value.length)
 const averageRating = computed(() => {
@@ -235,7 +233,7 @@ const scrollThumbnails = (event) => {
 }
 const addToCard = async () => {
   try {
-    if (!userStore.uid) {
+    if (!localStorage.getItem('uid')) {
       alert('Bạn cần đăng nhập trước khi thêm sản phẩm vào giỏ hàng.')
       return
     }
@@ -246,7 +244,7 @@ const addToCard = async () => {
       stock: quantity.value, // Đảm bảo quantity.value có dữ liệu hợp lệ
     }
 
-    const link = `http://localhost:5121/api/users/${userStore.uid}/shopping-cart/add` // Dùng backtick
+    const link = `http://localhost:5121/api/users/${localStorage.getItem('uid')}/shopping-cart/add` // Dùng backtick
     console.log(link) // Debug link
 
     const response = await fetch(link, {
