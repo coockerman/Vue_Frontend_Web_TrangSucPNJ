@@ -28,7 +28,7 @@ const router = createRouter({
       path: '/admin-home',
       name: 'adminHome',
       component: AdminHome,
-      meta: { requireRole: true },
+      meta: { requireRoleAdmin: true },
       children: [
         {
           path: 'managerProduct',
@@ -50,6 +50,7 @@ const router = createRouter({
     {
       path: '/user-home',
       component: UserHome,
+      meta: { requireRoleUser: true },
       children: [
         {
           path: '',
@@ -96,7 +97,11 @@ router.beforeEach((to, from, next) => {
     return next('/authentication') // Không có token thì về trang đăng nhập
   }
 
-  if (to.matched.some((record) => record.meta.requireRole) && role !== 'admin') {
+  if (to.matched.some((record) => record.meta.requireRoleAdmin) && role !== 'admin') {
+    return next('/authentication') // Không phải admin thì về trang đăng nhập
+  }
+
+  if (to.matched.some((record) => record.meta.requireRoleUser) && role !== 'user') {
     return next('/authentication') // Không phải admin thì về trang đăng nhập
   }
 

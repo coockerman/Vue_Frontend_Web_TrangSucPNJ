@@ -55,7 +55,12 @@
       <input type="file" @change="uploadImage" multiple />
 
       <!-- Input để nhập link ảnh -->
-      <input v-model="imageLink" type="text" placeholder="Nhập link ảnh..." />
+      <input
+        v-model="imageLink"
+        type="text"
+        placeholder="Nhập link ảnh..."
+        @keyup.enter.prevent="addImageLink"
+      />
       <button type="button" @click="addImageLink">Thêm ảnh từ url</button>
 
       <!-- Hiển thị danh sách ảnh -->
