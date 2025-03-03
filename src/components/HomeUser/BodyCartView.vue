@@ -1,5 +1,12 @@
 <template>
   <div class="cart-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+      <router-link to="/user-home">Home</router-link>
+      <span> > </span>
+      <span>Giỏ hàng</span>
+    </nav>
+
     <h1 class="cart-title">Giỏ hàng của bạn</h1>
 
     <div class="cart-content">
@@ -124,6 +131,19 @@ const updateProductShoppingCart = async (idCart, idProduct, size, stock) => {
     alert('Có lỗi xảy ra, vui lòng thử lại.')
   }
 }
+const deleteProductShoppingCart = async (idCart) => {
+  try {
+    const link = `http://localhost:5121/api/users/${userStore.uid}/shopping-cart/remove/${idCart}`
+    const response = await fetch(link, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+    })
+    if (!response.ok) throw new Error('Lỗi khi xoá dữ liệu')
+  } catch (error) {
+    console.error(error)
+    alert('Có lỗi xảy ra, vui lòng thử lại.')
+  }
+}
 // Gọi API khi load trang
 onMounted(async () => {
   await fetchCart()
@@ -164,6 +184,7 @@ const decreaseQuantity = (item) => {
 // Xóa sản phẩm khỏi giỏ hàng
 const removeFromCart = (item) => {
   cartItems.value = cartItems.value.filter((cartItem) => cartItem !== item)
+  deleteProductShoppingCart(item.id)
 }
 
 // Tổng tiền giỏ hàng
@@ -387,6 +408,30 @@ const totalPrice = computed(() => {
 .text-lg {
   font-size: 1.15rem; /* Kích thước lớn hơn mặc định (20px) */
   font-weight: bold; /* Chữ in đậm */
+}
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  margin-top: 15px;
+  width: 80%; /* Đảm bảo breadcrumb trải dài toàn bộ chiều ngang */
+  justify-content: flex-start; /* Căn về bên trái */
+  padding-left: 5px; /* Tạo khoảng cách với mép trái */
+}
+
+.breadcrumb a {
+  text-decoration: none;
+  color: rgb(20, 20, 20);
+  font-weight: bold;
+}
+
+.breadcrumb span {
+  margin: 0 5px;
+  color: gray;
+}
+
+.breadcrumb a:hover {
+  text-decoration: underline;
 }
 </style>
   

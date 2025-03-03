@@ -1,20 +1,23 @@
 <template>
   <div class="banner">
     <transition name="fade" mode="out-in">
-      <img :key="currentAd.id" :src="currentAd.urlImage" alt="PNJ Banner" class="banner-img" />
-    </transition>
-    <div class="banner-content">
-      <div class="sale-badge" v-if="currentAd">
-        <span>SALE</span>
-        <span class="sale-text">GET 20% WITH PNJ</span>
+      <div :key="currentAd.id" class="banner-slide">
+        <img :src="currentAd.urlImage" alt="PNJ Banner" class="banner-img" />
+        <div class="banner-content">
+          <div class="sale-badge" v-if="currentAd">
+            <span>SALE</span>
+            <span class="sale-text">GET 20% WITH PNJ</span>
+          </div>
+          <button class="explore-btn" @click="scrollToBottom">Khám phá ngay</button>
+        </div>
       </div>
-      <!-- <h1 class="title" v-if="currentAd">{{ currentAd.name }}</h1> -->
-      <button class="explore-btn" @click="scrollToBottom">Khám phá ngay</button>
-    </div>
+    </transition>
+
     <button class="nav-btn left" @click="prevSlide">&#10094;</button>
     <button class="nav-btn right" @click="nextSlide">&#10095;</button>
   </div>
 </template>
+
 
 <script>
 import axios from 'axios'
@@ -50,7 +53,7 @@ export default {
     startAutoSlide() {
       setInterval(() => {
         this.nextSlide()
-      }, 3000)
+      }, 5000)
     },
     scrollToBottom() {
       window.scrollBy({ top: window.innerHeight * 1.1, behavior: 'smooth' })
@@ -76,9 +79,12 @@ export default {
 }
 
 .banner-img {
-  width: 100%;
-  object-fit: cover;
+  width: 98vw; /* Chiều rộng toàn màn hình */
+  height: 85vh; /* Giữ nguyên chiều cao theo banner */
+  object-fit: contain; /* Hiển thị toàn bộ ảnh mà không bị crop */
   position: absolute;
+  top: 0;
+  left: 0;
   transition: opacity 1s ease-in-out;
 }
 
@@ -93,7 +99,7 @@ export default {
 
 .sale-badge {
   background: rgba(255, 255, 255, 0.2);
-  padding: 5px 5px;
+  padding: 8px 5px;
   border-radius: 5px;
   margin: 10px;
 }
@@ -140,8 +146,9 @@ export default {
 
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 1s;
+  transition: opacity 1s ease-in-out;
 }
+
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
