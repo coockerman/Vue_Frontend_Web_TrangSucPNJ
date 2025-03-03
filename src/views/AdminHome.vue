@@ -67,7 +67,7 @@ export default {
 .admin-container {
   display: flex;
   height: 100vh;
-  overflow: hidden; /* Ngăn trang bị cuộn theo toàn bộ chiều cao */
+  overflow-y: auto; /* Ngăn trang bị cuộn theo toàn bộ chiều cao */
 }
 
 .sidebar {
@@ -112,7 +112,7 @@ export default {
   flex-direction: column;
   margin-left: 200px; /* Điều chỉnh phù hợp với sidebar */
   height: 100vh;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .topbar {

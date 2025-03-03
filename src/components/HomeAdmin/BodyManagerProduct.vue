@@ -56,7 +56,7 @@
 
       <!-- Input để nhập link ảnh -->
       <input v-model="imageLink" type="text" placeholder="Nhập link ảnh..." />
-      <button type="button" @click="addImageLink">Thêm</button>
+      <button type="button" @click="addImageLink">Thêm ảnh từ url</button>
 
       <!-- Hiển thị danh sách ảnh -->
       <div v-for="(link, index) in formData.productImg" :key="index">
@@ -86,53 +86,68 @@
       <button v-if="isEditing" type="button" @click="cancelEdit">Hủy</button>
     </form>
 
-    <!-- Danh sách sản phẩm -->
-    <table>
-      <thead>
-        <tr>
-          <th>Tên sản phẩm</th>
-          <th>Loại</th>
-          <th>Giới tính</th>
-          <th>Giá</th>
-          <th>Tồn kho</th>
-          <th>Thao tác</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="product in products" :key="product.id">
-          <td>{{ product.nameProduct }}</td>
-          <td>{{ product.type }}</td>
-          <td>{{ product.gender }}</td>
-          <td>
-            <div v-for="(size, index) in product.sizePrice" :key="index">
-              Size {{ size.size }}: {{ size.price.toLocaleString() }} VND
-            </div>
-          </td>
-          <td>
-            <div v-for="(size, index) in product.sizePrice" :key="index">
-              Size {{ size.size }}: {{ size.stock }}
-            </div>
-          </td>
-          <td>
-            <button @click="editProduct(product)">Sửa</button>
-            <button @click="deleteProduct(product.id)">Xóa</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div>
+      <!-- Bộ lọc -->
+      <div class="filter-container">
+        <label for="filter">Lọc theo loại: </label>
+        <select v-model="selectedType">
+          <option value="">Tất cả</option>
+          <option v-for="type in uniqueTypes" :key="type" :value="type">
+            {{ type }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Bảng sản phẩm -->
+      <table>
+        <thead>
+          <tr>
+            <th>Tên sản phẩm</th>
+            <th>Loại</th>
+            <th>Giới tính</th>
+            <th>Giá</th>
+            <th>Tồn kho</th>
+            <th>Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="product in filteredProducts" :key="product.id">
+            <td>{{ product.nameProduct }}</td>
+            <td>{{ product.type }}</td>
+            <td>{{ product.gender }}</td>
+            <td>
+              <div v-for="(size, index) in product.sizePrice" :key="index">
+                Size {{ size.size }}: {{ size.price.toLocaleString() }} VND
+              </div>
+            </td>
+            <td>
+              <div v-for="(size, index) in product.sizePrice" :key="index">
+                Size {{ size.size }}: {{ size.stock }}
+              </div>
+            </td>
+            <td>
+              <button @click="editProduct(product)">Sửa</button>
+              <button @click="deleteProduct(product.id)">Xóa</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
   
   
 <script>
 import axios from 'axios'
-import { storage } from '@/firebaseStorage' // Đảm bảo đường dẫn đúng
+import { storage } from '@/firebaseStorage'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { nextTick } from 'vue'
 
 export default {
   data() {
     return {
       products: [],
+      selectedType: '', // Lọc theo loại sản phẩm
       formData: {
         id: '',
         nameProduct: '',
@@ -142,10 +157,10 @@ export default {
         material: '',
         karat: '',
         sizePrice: [{ size: 18, stock: 0, price: 0 }],
-        productImg: [''], // Mảng link ảnh
+        productImg: [], // Loại bỏ giá trị rỗng
         show: '',
       },
-      imageLink: '', // Lưu link nhập vào
+      imageLink: '',
       isEditing: false,
     }
   },
@@ -160,12 +175,11 @@ export default {
     },
 
     async saveProduct() {
-      console.log('Dữ liệu gửi đi:', JSON.stringify(this.formData, null, 2)) // 📌 In ra console
       try {
         await axios.post('http://localhost:5121/api/products/create-or-update', this.formData)
-        console.log(this.isEditing ? '✅ Đã cập nhật sản phẩm' : '✅ Đã thêm sản phẩm') // 📌 Log trạng thái
-        this.fetchProducts()
+        console.log(this.isEditing ? '✅ Đã cập nhật sản phẩm' : '✅ Đã thêm sản phẩm')
         this.resetForm()
+        this.fetchProducts() // Gọi API sau khi lưu thành công
       } catch (error) {
         console.error('Lỗi khi lưu sản phẩm:', error)
       }
@@ -175,13 +189,14 @@ export default {
       if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
         try {
           await axios.delete(`http://localhost:5121/api/products/delete/${id}`)
-          console.log(`❌ Đã xóa sản phẩm có ID: ${id}`) // 📌 Log xóa sản phẩm
-          this.fetchProducts()
+          console.log(`❌ Đã xóa sản phẩm có ID: ${id}`)
+          this.fetchProducts() // Chỉ gọi nếu thành công
         } catch (error) {
           console.error('Lỗi khi xóa sản phẩm:', error)
         }
       }
     },
+
     async uploadImage(event) {
       const files = event.target.files
       for (let file of files) {
@@ -191,24 +206,32 @@ export default {
         this.formData.productImg.push(url)
       }
     },
+
     addImageLink() {
-      if (this.imageLink.trim()) {
-        this.formData.productImg.push(this.imageLink.trim())
-        this.imageLink = '' // Xóa input sau khi thêm
+      if (!this.imageLink.trim()) {
+        alert('Vui lòng nhập link ảnh hợp lệ!')
+        return
       }
+      this.formData.productImg.push(this.imageLink.trim())
+      this.imageLink = ''
     },
+
     removeImage(index) {
+      console.log('❌ Xóa ảnh:', this.formData.productImg[index])
       this.formData.productImg.splice(index, 1)
     },
+
     editProduct(product) {
       this.formData = { ...product, sizePrice: [...product.sizePrice] }
       this.isEditing = true
-      console.log('📝 Đang chỉnh sửa sản phẩm:', JSON.stringify(this.formData, null, 2)) // 📌 Log khi sửa
+      nextTick(() => {
+        setTimeout(() => {
+          document.querySelector('.page-content')?.scrollTo({ top: 0, behavior: 'smooth' })
+        }, 200)
+      })
     },
-
     cancelEdit() {
       this.resetForm()
-      console.log('🚫 Hủy chỉnh sửa') // 📌 Log hủy
     },
 
     resetForm() {
@@ -221,42 +244,43 @@ export default {
         material: '',
         karat: '',
         sizePrice: [{ size: 18, stock: 0, price: 0 }],
+        productImg: [],
+        show: '',
       }
       this.isEditing = false
     },
 
     addSize() {
       this.formData.sizePrice.push({ size: 0, stock: 0, price: 0 })
-      console.log('➕ Đã thêm size mới:', this.formData.sizePrice) // 📌 Log khi thêm size
     },
 
     removeSize(index) {
-      console.log('❌ Đã xóa size:', this.formData.sizePrice[index]) // 📌 Log khi xóa size
       this.formData.sizePrice.splice(index, 1)
-    },
-    addImage() {
-      this.formData.productImg.push('')
-      console.log('➕ Đã thêm link ảnh:', this.formData.productImg)
-    },
-
-    removeImage(index) {
-      console.log('❌ Đã xóa link ảnh:', this.formData.productImg[index])
-      this.formData.productImg.splice(index, 1)
     },
   },
 
   mounted() {
     this.fetchProducts()
   },
+  computed: {
+    filteredProducts() {
+      if (!this.selectedType) return this.products
+      return this.products.filter((product) => product.type === this.selectedType)
+    },
+    uniqueTypes() {
+      return [...new Set(this.products.map((p) => p.type))]
+    },
+  },
 }
 </script>
+
 
 
   
   <style scoped>
 .product-manager {
   max-width: 1500px;
-  margin: 0 auto;
+  overflow-y: auto;
   padding: 20px;
   background: #f8f9fa;
   border-radius: 8px;
@@ -344,7 +368,7 @@ table {
   background: #fff;
   margin-top: 20px;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: auto !important;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
@@ -387,7 +411,6 @@ tbody tr:hover {
   border: 1px solid #ddd;
 }
 select {
-  width: 100%;
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -410,6 +433,64 @@ select:focus {
   border-color: #52b752;
   outline: none;
   box-shadow: 0 0 5px rgba(82, 183, 82, 0.5);
+}
+td button {
+  background-color: #4caf50; /* Màu xanh lá */
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.1s;
+  border-radius: 5px;
+  margin-right: 5px;
+}
+
+td button:hover {
+  background-color: #45a049; /* Màu xanh đậm hơn khi hover */
+}
+
+td button:active {
+  transform: scale(0.95); /* Nhấn vào thì thu nhỏ nhẹ */
+}
+
+td button:nth-child(2) {
+  background-color: #e74c3c; /* Màu đỏ cho nút Xóa */
+}
+
+td button:nth-child(2):hover {
+  background-color: #c0392b;
+}
+
+.filter-container {
+  margin: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-container label {
+  font-weight: bold;
+  color: #333;
+}
+
+.filter-container select {
+  min-width: 200px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  cursor: pointer;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.filter-container select:hover {
+  border-color: #007bff;
+}
+
+.filter-container select:focus {
+  outline: none;
+  border-color: #0056b3;
+  box-shadow: 0 0 5px rgba(0, 91, 187, 0.5);
 }
 </style>
   
