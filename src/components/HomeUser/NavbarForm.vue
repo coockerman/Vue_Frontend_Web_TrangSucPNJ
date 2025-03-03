@@ -18,9 +18,9 @@
 
       <!-- Nút giỏ hàng -->
       <div class="icon-wrapper">
-        <button class="icon-button">
+        <router-link :to="`/user-home/cartView`">
           <img src="/src/assets/Img/shopping-cart.png" alt="Cart" />
-        </button>
+        </router-link>
       </div>
 
       <!-- Nút tài khoản -->

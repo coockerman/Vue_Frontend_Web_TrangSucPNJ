@@ -11,7 +11,7 @@ import BodyUserProfile from '@/components/HomeUser/BodyUserProfile.vue'
 import BodyAdminTitle from '@/components/HomeAdmin/BodyAdminTitle.vue'
 import BodyManagerOrder from '@/components/HomeAdmin/BodyManagerOrder.vue'
 import BodyProductDetail from '@/components/HomeUser/BodyProductDetail.vue'
-
+import BodyCartView from '@/components/HomeUser/BodyCartView.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -82,6 +82,12 @@ const router = createRouter({
           path: 'userProfile',
           name: 'userProfile',
           component: BodyUserProfile,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'cartView',
+          name: 'cartView',
+          component: BodyCartView,
           meta: { requiresAuth: true },
         },
       ],
