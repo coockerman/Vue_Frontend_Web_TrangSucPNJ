@@ -24,7 +24,7 @@
     <div class="discount-section">
       <input
         type="text"
-        v-model="discountCode"
+        v-model="couponCode"
         placeholder="Chọn mã ưu đãi"
         readonly
         @click="openDiscountModal"
@@ -37,26 +37,71 @@
       <div class="modal-content">
         <h3>Chọn mã ưu đãi</h3>
         <ul>
-          <li
-            v-for="discount in availableDiscounts"
-            :key="discount.id"
-            @click="selectDiscount(discount)"
-          >
-            <strong>{{ discount.code }}</strong> - Giảm {{ discount.value }} đ
+          <li v-for="coupon in availableDiscounts" :key="coupon.id" @click="selectDiscount(coupon)">
+            <div v-if="coupon.stock > 0">
+              <strong>{{ coupon.name }}</strong> - Giảm {{ coupon.discount }} đ
+            </div>
           </li>
         </ul>
         <button @click="closeDiscountModal">Đóng</button>
       </div>
     </div>
 
+    <!--User-->
+    <div class="user-container">
+      <h2>Thông tin người nhận hàng</h2>
+
+      <div>
+        <div class="form-group">
+          <label>Họ và Tên: </label>
+          <input v-model="user.fullName" type="text" />
+        </div>
+
+        <div class="form-group">
+          <label>Email thông báo: </label>
+          <input v-model="user.email" type="email" />
+        </div>
+
+        <div class="form-group">
+          <label>Số điện thoại người nhận: </label>
+          <input v-model="user.numberPhone" type="text" />
+        </div>
+      </div>
+    </div>
+
+    <!--Địa chỉ-->
+    <div>
+      <div class="address-selection">
+        <button @click="showAddressModal = true">Chọn địa chỉ nhận hàng</button>
+        <p v-if="selectedAddress">
+          Địa chỉ đã chọn: {{ selectedAddress.street }}, {{ selectedAddress.city }},
+          {{ selectedAddress.country }}
+        </p>
+      </div>
+
+      <!-- Modal hiển thị danh sách địa chỉ -->
+      <div v-if="showAddressModal" class="modal">
+        <div class="modal-content">
+          <h3>Chọn địa chỉ</h3>
+          <ul>
+            <li v-for="address in addresses" :key="address.id" @click="selectAddress(address)">
+              {{ address.street }}, {{ address.city }}, {{ address.country }}
+            </li>
+          </ul>
+          <button @click="showAddressModal = false">Đóng</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Tổng tiền -->
     <div class="summary">
+      <h2>Thanh toán</h2>
       <p>
         Tạm tính: <span>{{ formatCurrency(subTotal) }} đ</span>
       </p>
       <p>Giao hàng: <span>Miễn phí</span></p>
       <p>
-        Giảm giá: <span>- {{ formatCurrency(discount) }} đ</span>
+        Giảm giá: <span>- {{ formatCurrency(coupon) }} đ</span>
       </p>
       <p class="total">
         Tổng tiền: <span>{{ formatCurrency(totalPrice) }} đ</span>
@@ -72,6 +117,43 @@
         🏬 Nhận tại cửa hàng
       </button>
     </div>
+
+    <!-- Phương thức thanh toán -->
+    <div class="checkout-container-payment">
+      <!-- Đồng ý điều khoản -->
+      <div class="agreement">
+        <input type="checkbox" id="agreeTerms" v-model="agreeTerms" />
+        <label for="agreeTerms">
+          Tôi đồng ý cho PNJ thu thập, xử lý dữ liệu cá nhân của tôi theo quy định tại
+          <a href="#">Thông báo này</a> và theo quy định của pháp luật
+        </label>
+      </div>
+
+      <!-- Phương thức thanh toán -->
+      <div v-if="deliveryMethod === 'home'" class="payment-methods">
+        <h3>Phương thức thanh toán</h3>
+        <div v-for="method in paymentMethods" :key="method.id" class="payment-option">
+          <input type="radio" :id="method.id" v-model="selectedPayment" :value="method.id" />
+          <label :for="method.id">
+            <img v-if="method.icon" :src="method.icon" class="icon" />
+            {{ method.name }}
+            <span v-if="method.description" class="description">({{ method.description }})</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Ghi chú đơn hàng -->
+      <div class="order-note">
+        <h3>Ghi chú đơn hàng <span class="optional">(Không bắt buộc)</span></h3>
+        <textarea
+          v-model="orderNote"
+          placeholder="*Vui lòng ghi chú thêm để PNJ có thể phục vụ bạn một cách tốt nhất."
+        ></textarea>
+      </div>
+
+      <!-- Nút đặt hàng -->
+      <button class="order-button" @click="placeOrder">Đặt hàng</button>
+    </div>
   </div>
 </template>
   
@@ -81,18 +163,72 @@ import axios from 'axios'
 
 const cartItems = ref([])
 const products = ref({})
-const discountCode = ref('')
+const couponCode = ref('')
 const showDiscountModal = ref(false)
-const discount = ref(0)
+const coupon = ref(0)
 const deliveryMethod = ref('home')
+const addresses = ref([])
+const selectedAddress = ref(null)
+const showAddressModal = ref(false)
+const userId = localStorage.getItem('uid')
 
-// Danh sách mã giảm giá (giả lập)
-const availableDiscounts = ref([
-  { id: 1, code: 'SALE50', value: 50000 },
-  { id: 2, code: 'FREESHIP', value: 30000 },
-  { id: 3, code: 'VIP100', value: 100000 },
+const agreeTerms = ref(false)
+const selectedPayment = ref('cod')
+const orderNote = ref('')
+
+const user = ref('')
+
+const paymentMethods = ref([
+  { id: 'cod', name: 'Thanh toán tiền mặt khi nhận hàng (COD)', icon: 'cod-icon.png' },
+  { id: 'bank', name: 'Thanh toán chuyển khoản', icon: 'bank-icon.png' },
+  {
+    id: 'visa',
+    name: 'Thanh toán thẻ quốc tế',
+    description: 'VISA, Master, JCB',
+    icon: 'visa-icon.png',
+  },
+  { id: 'credit', name: 'Trả góp thẻ tín dụng 0%', icon: 'credit-icon.png' },
+  { id: 'vnpay', name: 'Thanh toán VNPAY', icon: 'vnpay-icon.png' },
+  { id: 'momo', name: 'Thanh toán bằng ví MoMo', icon: 'momo-icon.png' },
+  { id: 'qr', name: 'Quét mã QR', icon: 'qr-icon.png' },
+  { id: 'zalopay', name: 'Thanh toán Zalopay - QR đa năng', icon: 'zalopay-icon.png' },
 ])
 
+// Danh sách mã giảm giá (giả lập)
+const availableDiscounts = ref([])
+
+const fetchCoupon = async () => {
+  try {
+    const response = await axios.get(`http://localhost:5121/api/coupons/all`)
+    availableDiscounts.value = response.data.filter((coupon) => coupon.stock > 0)
+  } catch (error) {
+    console.error('Lỗi lấy mã giảm giá:', error)
+  }
+}
+
+const fetchUser = async () => {
+  try {
+    const response = await axios.get(`http://localhost:5121/api/users/detail/${userId}`)
+    user.value = response.data
+  } catch (error) {
+    console.error('Lỗi lấy mã giảm giá:', error)
+  }
+}
+
+const fetchAddresses = async () => {
+  try {
+    const response = await axios.get(`http://localhost:5121/api/users/${userId}/addAddress`)
+    addresses.value = Array.isArray(response.data) ? response.data : []
+    selectedAddress.value = addresses.value[0]
+  } catch (error) {
+    console.error('Lỗi lấy danh sách địa chỉ:', error)
+  }
+}
+
+const selectAddress = (address) => {
+  selectedAddress.value = address
+  showAddressModal.value = false
+}
 const openDiscountModal = () => {
   showDiscountModal.value = true
 }
@@ -102,16 +238,14 @@ const closeDiscountModal = () => {
 }
 
 const selectDiscount = (disc) => {
-  discount.value = disc.value
-  discountCode.value = disc.code
+  coupon.value = disc.discount
+  couponCode.value = disc.name
   closeDiscountModal()
 }
 
 const fetchCart = async () => {
   try {
-    const response = await axios.get(
-      `http://localhost:5121/api/users/${localStorage.getItem('uid')}/shopping-cart`
-    )
+    const response = await axios.get(`http://localhost:5121/api/users/${userId}/shopping-cart`)
     cartItems.value = Array.isArray(response.data) ? response.data : []
   } catch (error) {
     console.error('Lỗi lấy giỏ hàng:', error)
@@ -148,7 +282,7 @@ const totalPrice = computed(() => {
     cartItems.value.reduce((total, item) => {
       const product = products.value[item.idProduct]
       return total + getPrice(product, item.size) * item.stock
-    }, 0) - discount.value
+    }, 0) - coupon.value
   )
 })
 
@@ -160,8 +294,19 @@ const setDeliveryMethod = (method) => {
   deliveryMethod.value = method
 }
 
+const placeOrder = () => {
+  if (!agreeTerms.value) {
+    alert('Bạn cần đồng ý với điều khoản trước khi đặt hàng.')
+    return
+  }
+  console.log('Đặt hàng với phương thức:', selectedPayment.value)
+}
+
 onMounted(async () => {
   await fetchCart()
+  await fetchCoupon()
+  await fetchAddresses()
+  await fetchUser()
   cartItems.value.forEach((item) => fetchProduct(item.idProduct))
 })
 </script>
@@ -170,7 +315,7 @@ onMounted(async () => {
   <style scoped>
 .checkout-container {
   width: 800px;
-  margin: 20px auto;
+  margin: 20px 120px;
   font-family: Arial, sans-serif;
   border: 1px solid #ddd;
   padding: 20px;
@@ -244,6 +389,8 @@ onMounted(async () => {
 
 .discount-section {
   display: flex;
+  align-items: center;
+  margin-top: 10px;
   margin-bottom: 10px;
 }
 
@@ -261,16 +408,37 @@ onMounted(async () => {
   cursor: pointer;
 }
 
+.summary {
+  position: fixed;
+  width: 300px;
+  top: 92px;
+  bottom: 0;
+  right: 20px;
+  height: 100%;
+  background: white;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  padding: 25px 30px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 16px;
+  border-top: 2px solid #ddd;
+}
+
 .summary p {
+  margin: 5px 0;
   display: flex;
   justify-content: space-between;
-  margin: 5px 0;
+  font-weight: 500;
 }
 
 .summary .total {
-  font-weight: bold;
   font-size: 18px;
-  color: #d32f2f;
+  font-weight: bold;
+  color: #a70c1b;
+}
+
+.summary span {
+  font-weight: bold;
 }
 
 .buyer-info {
@@ -305,7 +473,7 @@ onMounted(async () => {
 }
 .modal-overlay {
   position: fixed;
-  top: 0;
+  top: 0px;
   left: 0;
   width: 100%;
   height: 100%;
@@ -338,15 +506,174 @@ onMounted(async () => {
 .modal-content li:hover {
   background: #f4f4f4;
 }
-
 button {
-  margin-top: 10px;
   padding: 8px 15px;
   border: none;
   background: #d32f2f;
   color: white;
   cursor: pointer;
   border-radius: 5px;
+}
+/* Modal nền mờ */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Làm mờ nền */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Nội dung modal */
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  width: 500px;
+  max-width: 90%;
+  text-align: center;
+}
+
+/* Danh sách địa chỉ */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+li:hover {
+  background: #f0f0f0;
+}
+/* payment */
+.checkout-container-payment {
+  margin: 10px;
+}
+
+.agreement {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+
+.payment-methods {
+  margin-top: 20px;
+}
+
+.payment-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-top: 5px;
+  cursor: pointer;
+}
+
+.payment-option input {
+  margin-right: 10px;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+}
+
+.description {
+  font-size: 12px;
+  color: gray;
+}
+
+.order-note {
+  margin-top: 20px;
+}
+
+.order-note textarea {
+  width: 100%;
+  height: 80px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  resize: none;
+}
+
+.order-button {
+  width: 100%;
+  background: #a70c1b;
+  color: white;
+  padding: 12px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 15px;
+}
+
+.order-button:hover {
+  background: #870915;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.input-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.form-group {
+  margin-bottom: 12px;
+}
+
+label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+}
+.form-group input,
+select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.address-selection {
+  display: flex;
+  align-items: center; /* Canh giữa theo chiều dọc */
+  gap: 10px; /* Khoảng cách giữa nút và text */
+}
+
+.address-selection button {
+  background: #007bff;
+  color: white;
+  padding: 8px 12px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.address-selection p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
 }
 </style>
   

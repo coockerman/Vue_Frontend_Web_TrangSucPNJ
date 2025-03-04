@@ -39,13 +39,17 @@ export default {
   height: 100vh; /* Đảm bảo toàn màn hình */
   width: 100vw;
   background-color: #ffffff;
-  padding: 0 10vw;
+  padding: 0 15vw;
 }
 
 .logo-section {
   flex: 1;
   justify-content: center;
   align-items: center;
+}
+
+.logo-section:hover {
+  background-color: #efefef;
 }
 
 .logo {
