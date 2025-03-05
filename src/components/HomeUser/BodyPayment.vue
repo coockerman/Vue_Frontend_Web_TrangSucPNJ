@@ -225,6 +225,54 @@ const fetchAddresses = async () => {
   }
 }
 
+const fetpayment = async () => {
+  try {
+    if (!localStorage.getItem('uid')) {
+      alert('Bạn cần đăng nhập trước khi thanh toán')
+      return
+    }
+
+    const formData = {
+      id: '', // ID đơn hàng, có thể để trống vì BE sẽ tự sinh
+      productItem: [], // Danh sách sản phẩm, hiện tại có thể để trống
+      status: 'pending', // Trạng thái đơn hàng
+      typePayment: 'paypal', // Chỉnh sửa để khớp với backend
+      totalAmount: totalPrice.value / 100, // Tổng tiền
+      idUserOrder: userId, // ID của người đặt hàng
+      couponDiscount: coupon.value, // Giảm giá từ mã coupon
+      timeOrder: new Date().toISOString(), // Thời gian đặt hàng
+    }
+
+    console.log('Sending Data:', JSON.stringify(formData, null, 2))
+
+    const link = `http://localhost:5121/api/paypal/create-payment` // Kiểm tra đúng API chưa
+    console.log('API Link:', link)
+
+    const response = await fetch(link, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    })
+
+    if (!response.ok) throw new Error('Lỗi khi gọi API thanh toán')
+
+    const data = await response.json()
+    console.log('Received Data:', data)
+
+    // Kiểm tra nếu có URL thanh toán từ BE
+    if (data.url) {
+      console.log('Chuyển hướng đến:', data.url)
+      window.location.href = data.url
+      //window.open(data.url, '_blank') //⚡ Mở trong tab mới
+    } else {
+      throw new Error('Không nhận được URL thanh toán')
+    }
+  } catch (error) {
+    console.error(error)
+    alert('Có lỗi xảy ra, vui lòng thử lại.')
+  }
+}
+
 const selectAddress = (address) => {
   selectedAddress.value = address
   showAddressModal.value = false
@@ -299,6 +347,7 @@ const placeOrder = () => {
     alert('Bạn cần đồng ý với điều khoản trước khi đặt hàng.')
     return
   }
+  fetpayment()
   console.log('Đặt hàng với phương thức:', selectedPayment.value)
 }
 
