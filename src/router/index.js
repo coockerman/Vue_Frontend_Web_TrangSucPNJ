@@ -13,7 +13,7 @@ import BodyManagerOrder from '@/components/HomeAdmin/BodyManagerOrder.vue'
 import BodyProductDetail from '@/components/HomeUser/BodyProductDetail.vue'
 import BodyCartView from '@/components/HomeUser/BodyCartView.vue'
 import BodyPayment from '@/components/HomeUser/BodyPayment.vue'
-
+import BodySuccessPayment from '@/components/HomeUser/BodySuccessPayment.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -97,6 +97,11 @@ const router = createRouter({
           name: 'payment',
           component: BodyPayment,
           meta: { requiresAuth: true },
+        },
+        {
+          path: 'payment-success',
+          name: 'payment-success',
+          component: BodySuccessPayment,
         },
       ],
     },

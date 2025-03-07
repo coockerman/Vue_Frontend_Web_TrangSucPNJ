@@ -234,10 +234,11 @@ const fetpayment = async () => {
 
     const formData = {
       id: '', // ID đơn hàng, có thể để trống vì BE sẽ tự sinh
-      productItem: [], // Danh sách sản phẩm, hiện tại có thể để trống
-      status: 'pending', // Trạng thái đơn hàng
+      productItems: [], // Danh sách sản phẩm, hiện tại có thể để trống
+      status: 'process', // Trạng thái đơn hàng
       typePayment: 'paypal', // Chỉnh sửa để khớp với backend
-      totalAmount: totalPrice.value / 100, // Tổng tiền
+      paymentId: '',
+      totalAmount: totalPrice.value, // Tổng tiền
       idUserOrder: userId, // ID của người đặt hàng
       couponDiscount: coupon.value, // Giảm giá từ mã coupon
       timeOrder: new Date().toISOString(), // Thời gian đặt hàng

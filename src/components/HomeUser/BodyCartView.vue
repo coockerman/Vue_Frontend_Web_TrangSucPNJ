@@ -133,21 +133,21 @@ const updateProductShoppingCart = async (idCart, idProduct, size, stock) => {
     alert('Có lỗi xảy ra, vui lòng thử lại.')
   }
 }
-const deleteProductShoppingCart = async (idCart) => {
+const deleteProductShoppingCart = async (idCart, size) => {
   try {
     const link = `http://localhost:5121/api/users/${localStorage.getItem(
       'uid'
-    )}/shopping-cart/remove/${idCart}`
-    const response = await fetch(link, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-    })
+    )}/shopping-cart/remove/${idCart}/${size}`
+
+    const response = await fetch(link, { method: 'DELETE' })
+
     if (!response.ok) throw new Error('Lỗi khi xoá dữ liệu')
   } catch (error) {
     console.error(error)
     alert('Có lỗi xảy ra, vui lòng thử lại.')
   }
 }
+
 // Gọi API khi load trang
 onMounted(async () => {
   await fetchCart()
@@ -188,7 +188,7 @@ const decreaseQuantity = (item) => {
 // Xóa sản phẩm khỏi giỏ hàng
 const removeFromCart = (item) => {
   cartItems.value = cartItems.value.filter((cartItem) => cartItem !== item)
-  deleteProductShoppingCart(item.id)
+  deleteProductShoppingCart(item.id, item.size)
 }
 
 // Tổng tiền giỏ hàng

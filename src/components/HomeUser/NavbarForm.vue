@@ -57,7 +57,7 @@ const isLoggedIn = ref(false)
 
 // Kiểm tra token khi component được tạo
 onMounted(() => {
-  isLoggedIn.value = !!localStorage.getItem('userToken')
+  isLoggedIn.value = localStorage.getItem('userRole') === 'user'
 })
 
 const toggleDropdown = () => {
