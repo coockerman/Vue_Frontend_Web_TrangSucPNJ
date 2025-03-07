@@ -14,6 +14,10 @@ import BodyProductDetail from '@/components/HomeUser/BodyProductDetail.vue'
 import BodyCartView from '@/components/HomeUser/BodyCartView.vue'
 import BodyPayment from '@/components/HomeUser/BodyPayment.vue'
 import BodySuccessPayment from '@/components/HomeUser/BodySuccessPayment.vue'
+import BodyFailPayment from '@/components/HomeUser/BodyFailPayment.vue'
+import BodyListPurchased from '@/components/HomeUser/BodyListPurchased.vue'
+import BodyOrderList from '@/components/HomeUser/BodyOrderList.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -102,6 +106,25 @@ const router = createRouter({
           path: 'payment-success',
           name: 'payment-success',
           component: BodySuccessPayment,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'payment-failed',
+          name: 'payment-fail',
+          component: BodyFailPayment,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'listPurchased',
+          name: 'listPurchased',
+          component: BodyListPurchased,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'listOrder',
+          name: 'listOrder',
+          component: BodyOrderList,
+          meta: { requiresAuth: true },
         },
       ],
     },
@@ -109,10 +132,11 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  const uid = localStorage.getItem('uid')
   const token = localStorage.getItem('userToken')
   const role = localStorage.getItem('userRole')
 
-  if (to.matched.some((record) => record.meta.requiresAuth) && !token) {
+  if (to.matched.some((record) => record.meta.requiresAuth) && !uid) {
     return next('/authentication') // Không có token thì về trang đăng nhập
   }
 

@@ -54,17 +54,17 @@
       <div>
         <div class="form-group">
           <label>Họ và Tên: </label>
-          <input v-model="user.fullName" type="text" />
+          <input v-model="nameUserGet" type="text" />
         </div>
 
         <div class="form-group">
           <label>Email thông báo: </label>
-          <input v-model="user.email" type="email" />
+          <input v-model="emailUserGet" type="email" />
         </div>
 
         <div class="form-group">
           <label>Số điện thoại người nhận: </label>
-          <input v-model="user.numberPhone" type="text" />
+          <input v-model="phoneUserGet" type="text" />
         </div>
       </div>
     </div>
@@ -73,10 +73,7 @@
     <div>
       <div class="address-selection">
         <button @click="showAddressModal = true">Chọn địa chỉ nhận hàng</button>
-        <p v-if="selectedAddress">
-          Địa chỉ đã chọn: {{ selectedAddress.street }}, {{ selectedAddress.city }},
-          {{ selectedAddress.country }}
-        </p>
+        <p v-if="selectedAddress">Địa chỉ đã chọn: {{ addressUserGet }}</p>
       </div>
 
       <!-- Modal hiển thị danh sách địa chỉ -->
@@ -101,7 +98,7 @@
       </p>
       <p>Giao hàng: <span>Miễn phí</span></p>
       <p>
-        Giảm giá: <span>- {{ formatCurrency(coupon) }} đ</span>
+        Giảm giá: <span>- {{ formatCurrency(coupon.discount) }} đ</span>
       </p>
       <p class="total">
         Tổng tiền: <span>{{ formatCurrency(totalPrice) }} đ</span>
@@ -164,19 +161,34 @@ import axios from 'axios'
 const cartItems = ref([])
 const products = ref({})
 const couponCode = ref('')
+
+const user = ref({
+  fullName: '',
+  email: '',
+  numberPhone: '',
+})
+const selectedAddress = ref(null)
+const nameUserGet = ref('')
+const emailUserGet = ref('')
+const phoneUserGet = ref('')
+const addressUserGet = ref('')
+
 const showDiscountModal = ref(false)
-const coupon = ref(0)
+const coupon = ref({
+  id: '',
+  discount: 0,
+  name: '',
+  stock: 0,
+})
 const deliveryMethod = ref('home')
 const addresses = ref([])
-const selectedAddress = ref(null)
+
 const showAddressModal = ref(false)
 const userId = localStorage.getItem('uid')
 
 const agreeTerms = ref(false)
 const selectedPayment = ref('cod')
 const orderNote = ref('')
-
-const user = ref('')
 
 const paymentMethods = ref([
   { id: 'cod', name: 'Thanh toán tiền mặt khi nhận hàng (COD)', icon: 'cod-icon.png' },
@@ -210,6 +222,9 @@ const fetchUser = async () => {
   try {
     const response = await axios.get(`http://localhost:5121/api/users/detail/${userId}`)
     user.value = response.data
+    nameUserGet.value = user.value.fullName
+    emailUserGet.value = user.value.email
+    phoneUserGet.value = user.value.numberPhone
   } catch (error) {
     console.error('Lỗi lấy mã giảm giá:', error)
   }
@@ -220,6 +235,9 @@ const fetchAddresses = async () => {
     const response = await axios.get(`http://localhost:5121/api/users/${userId}/addAddress`)
     addresses.value = Array.isArray(response.data) ? response.data : []
     selectedAddress.value = addresses.value[0]
+    addressUserGet.value = selectedAddress.value
+      ? `${selectedAddress.value.street}, ${selectedAddress.value.city}, ${selectedAddress.value.country}`
+      : ''
   } catch (error) {
     console.error('Lỗi lấy danh sách địa chỉ:', error)
   }
@@ -238,9 +256,14 @@ const fetpayment = async () => {
       status: 'process', // Trạng thái đơn hàng
       typePayment: 'paypal', // Chỉnh sửa để khớp với backend
       paymentId: '',
+      couponId: coupon.value.id,
+      nameUserGet: nameUserGet.value,
+      emailUserGet: emailUserGet.value,
+      phoneUserGet: phoneUserGet.value,
+      addressUserGet: addressUserGet.value,
       totalAmount: totalPrice.value, // Tổng tiền
       idUserOrder: userId, // ID của người đặt hàng
-      couponDiscount: coupon.value, // Giảm giá từ mã coupon
+      couponDiscount: coupon.value.discount, // Giảm giá từ mã coupon
       timeOrder: new Date().toISOString(), // Thời gian đặt hàng
     }
 
@@ -277,6 +300,9 @@ const fetpayment = async () => {
 const selectAddress = (address) => {
   selectedAddress.value = address
   showAddressModal.value = false
+  addressUserGet.value = selectedAddress.value
+    ? `${selectedAddress.value.street}, ${selectedAddress.value.city}, ${selectedAddress.value.country}`
+    : ''
 }
 const openDiscountModal = () => {
   showDiscountModal.value = true
@@ -287,7 +313,8 @@ const closeDiscountModal = () => {
 }
 
 const selectDiscount = (disc) => {
-  coupon.value = disc.discount
+  coupon.value.discount = disc.discount
+  coupon.value.id = disc.id
   couponCode.value = disc.name
   closeDiscountModal()
 }
@@ -331,7 +358,7 @@ const totalPrice = computed(() => {
     cartItems.value.reduce((total, item) => {
       const product = products.value[item.idProduct]
       return total + getPrice(product, item.size) * item.stock
-    }, 0) - coupon.value
+    }, 0) - coupon.value.discount
   )
 })
 

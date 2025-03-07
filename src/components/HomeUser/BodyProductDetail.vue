@@ -120,7 +120,7 @@
       </div>
 
       <div v-if="activeTab === 'comments'">
-        <p>Chưa có bình luận nào.</p>
+        <CommentList :productId="product.id" />
       </div>
 
       <div v-if="activeTab === 'reviews'">
@@ -143,6 +143,7 @@ import { useRoute } from 'vue-router'
 import axios from 'axios'
 import ProductTitle from './BodyProductDetail/ProductTitle.vue'
 import EvaluationList from './BodyProductDetail/EvaluationList.vue'
+import CommentList from './BodyProductDetail/CommentList.vue'
 
 const route = useRoute()
 const product = ref(null)

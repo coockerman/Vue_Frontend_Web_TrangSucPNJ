@@ -1,48 +1,52 @@
 <template>
-  <nav class="navbar">
-    <!-- Logo -->
-    <div class="logo">
-      <router-link to="/user-home">
-        <img src="/src/assets/Img/Logo.png" alt="PNJ" />
-      </router-link>
-    </div>
-
-    <!-- Search Bar -->
-    <input type="text" placeholder="Search for products..." class="search-bar" />
-
-    <!-- Menu Items -->
-    <div class="menu">
-      <router-link :to="`/user-home/products`"> TRANG SỨC </router-link>
-      <router-link to="#">GIFTS</router-link>
-      <router-link to="#">SALE</router-link>
-
-      <!-- Nút giỏ hàng -->
-      <div class="icon-wrapper">
-        <router-link :to="`/user-home/cartView`">
-          <img src="/src/assets/Img/shopping-cart.png" alt="Cart" />
+  <keep-alive>
+    <nav class="navbar">
+      <!-- Logo -->
+      <div class="logo">
+        <router-link to="/user-home">
+          <img src="/src/assets/Img/Logo.png" alt="PNJ" />
         </router-link>
       </div>
 
-      <!-- Nút tài khoản -->
-      <div class="icon-wrapper">
-        <img src="/src/assets/Img/AuthIcon.png" alt="Account" />
-        <!-- Bảng chọn -->
-        <div class="dropdown">
-          <template v-if="isLoggedIn">
-            <button>
-              <router-link class="text-normal" :to="'/user-home/userProfile'"
-                >Thông tin cá nhân</router-link
-              >
-            </button>
-            <button @click="logout">Đăng xuất</button>
-          </template>
-          <template v-else>
-            <button @click="goToLogin">Đăng nhập</button>
-          </template>
+      <!-- Search Bar -->
+      <input type="text" placeholder="Search for products..." class="search-bar" />
+
+      <!-- Menu Items -->
+      <div class="menu">
+        <router-link :to="`/user-home/products`"> TRANG SỨC </router-link>
+        <router-link to="#">GIFTS</router-link>
+        <router-link to="#">SALE</router-link>
+
+        <!-- Nút giỏ hàng -->
+        <div class="icon-wrapper">
+          <router-link :to="`/user-home/cartView`">
+            <img src="/src/assets/Img/shopping-cart.png" alt="Cart" />
+          </router-link>
+        </div>
+
+        <!-- Nút tài khoản -->
+        <div class="icon-wrapper">
+          <img src="/src/assets/Img/AuthIcon.png" alt="Account" />
+          <!-- Bảng chọn -->
+          <div class="dropdown">
+            <template v-if="isLoggedIn">
+              <button>
+                <router-link class="text-normal" :to="'/user-home/userProfile'"
+                  >Thông tin cá nhân</router-link
+                >
+              </button>
+              <button @click="goToPurchased">Sản phẩm đã mua</button>
+              <button @click="goToOrderList">Xem đơn hàng</button>
+              <button @click="logout">Đăng xuất</button>
+            </template>
+            <template v-else>
+              <button @click="goToLogin">Đăng nhập</button>
+            </template>
+          </div>
         </div>
       </div>
-    </div>
-  </nav>
+    </nav>
+  </keep-alive>
 </template>
 
 
@@ -57,6 +61,9 @@ const isLoggedIn = ref(false)
 
 // Kiểm tra token khi component được tạo
 onMounted(() => {
+  console.log(localStorage.getItem('userRole'))
+  console.log(localStorage.getItem('userToken'))
+  console.log(localStorage.getItem('uid'))
   isLoggedIn.value = localStorage.getItem('userRole') === 'user'
 })
 
@@ -68,7 +75,15 @@ const goToProfile = () => {
   router.push('/profile') // Chuyển hướng đến trang thông tin cá nhân
   dropdownOpen.value = false
 }
+const goToPurchased = () => {
+  router.push('/user-home/listPurchased') // Chuyển hướng đến trang thông tin cá nhân
+  dropdownOpen.value = false
+}
 
+const goToOrderList = () => {
+  router.push('/user-home/listOrder') // Chuyển hướng đến trang thông tin cá nhân
+  dropdownOpen.value = false
+}
 const logout = () => {
   localStorage.removeItem('userToken') // Xóa token đăng nhập
   localStorage.removeItem('userRole')

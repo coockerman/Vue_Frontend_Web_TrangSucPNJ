@@ -1,7 +1,7 @@
 <template>
   <div class="admin-container">
     <aside class="sidebar">
-      <h2>Admin Panel</h2>
+      <h1>Admin</h1>
       <ul>
         <router-link :to="'/admin-home/'">
           <li>Quản lý tài khoản</li>
@@ -69,6 +69,16 @@ export default {
   display: flex;
   height: 100vh;
   overflow-y: auto; /* Ngăn trang bị cuộn theo toàn bộ chiều cao */
+}
+.sidebar h1 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #fff;
+  text-align: center;
+  background: #1c4d3e;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
 }
 
 .sidebar {
