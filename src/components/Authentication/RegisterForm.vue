@@ -5,7 +5,7 @@
     <form @submit.prevent="handleRegister">
       <div class="input-group">
         <label class="label-text2">Full Name</label>
-        <input type="text" v-model="fullName" required placeholder="Enter your first name" />
+        <input type="text" v-model="fullName" required placeholder="Enter your full name" />
       </div>
       <div class="input-group">
         <label class="label-text2">Email Address</label>

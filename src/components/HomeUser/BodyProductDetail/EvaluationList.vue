@@ -45,29 +45,47 @@
   </div>
 </template>
   
-  <script setup>
-import { ref, watch, defineEmits, computed, onMounted } from 'vue'
+<script setup>
+import { ref, watch, defineEmits, computed, onMounted, watchEffect } from 'vue'
 import { useUserStore } from '@/stores/user'
 import axios from 'axios'
 
+const hasPurchased = ref(false)
+// Nhận các props từ component cha
 const props = defineProps({
-  evaluationIds: Array,
-  productId: String,
-  productName: String,
+  evaluationIds: Array, // Danh sách ID các đánh giá của sản phẩm
+  productId: String, // ID sản phẩm cần đánh giá
+  productName: String, // Tên sản phẩm
 })
+
+// Khai báo emit để có thể báo về component cha khi cần reload dữ liệu sản phẩm
 const emit = defineEmits(['reloadProduct'])
 
+// Danh sách đánh giá của sản phẩm
 const evaluations = ref([])
+// Trạng thái loading khi tải dữ liệu đánh giá
 const loading = ref(false)
-const userStore = useUserStore()
+const userTitle = ref({})
+
+// Nội dung đánh giá và số sao được chọn
 const reviewContent = ref('')
 const reviewStar = ref(0)
 const hoverStar = ref(0)
+
+// Trạng thái đang gửi đánh giá
 const isSubmitting = ref(false)
+
+// Lấy ID user từ localStorage
+const userId = localStorage.getItem('uid')
+
+// Kiểm tra xem người dùng hiện tại đã đánh giá sản phẩm này chưa
 const hasReviewed = computed(() => {
-  return evaluations.value.some((evaluation) => evaluation.idUser === userStore.uid)
+  const test = evaluations.value.some((evaluation) => evaluation.idUser === userId)
+  console.log(test)
+  return test
 })
 
+// Hàm tải danh sách đánh giá dựa trên danh sách ID đánh giá từ props
 const fetchEvaluations = async () => {
   if (!props.evaluationIds || props.evaluationIds.length === 0) {
     evaluations.value = []
@@ -89,8 +107,10 @@ const fetchEvaluations = async () => {
   }
 }
 
+// Theo dõi sự thay đổi của evaluationIds để tự động tải đánh giá mới
 watch(() => props.evaluationIds, fetchEvaluations, { immediate: true })
 
+// Hàm định dạng thời gian đánh giá
 const formatTime = (timestamp) => {
   return new Date(timestamp).toLocaleDateString('vi-VN', {
     year: 'numeric',
@@ -99,8 +119,19 @@ const formatTime = (timestamp) => {
   })
 }
 
-const hasPurchased = computed(() => userStore.userInfo?.purchasedCart?.includes(props.productId))
+watchEffect(async () => {
+  try {
+    const response = await axios.get(`http://localhost:5121/api/users/detail/${userId}`)
+    userTitle.value = response.data // ✅ Gán dữ liệu vào `ref`
 
+    hasPurchased.value = userTitle.value.purchasedCart?.includes(props.productId) || false
+    console.log('📌 Kiểm tra sản phẩm đã mua:', props.productId, '->', hasPurchased.value)
+  } catch (error) {
+    console.error('❌ Lỗi khi lấy dữ liệu user:', error)
+  }
+})
+
+// Hàm gửi đánh giá mới hoặc cập nhật đánh giá
 const submitReview = async () => {
   if (!reviewContent.value || reviewStar.value === 0) {
     alert('Vui lòng nhập nội dung và chọn số sao!')
@@ -109,20 +140,23 @@ const submitReview = async () => {
 
   isSubmitting.value = true
   try {
+    // Gửi dữ liệu đánh giá lên API
     const response = await axios.post('http://localhost:5121/api/evaluations/create-or-update', {
       id: '',
       content: reviewContent.value,
       idProduct: props.productId,
-      nameUser: `${userStore.userInfo?.firstName} ${userStore.userInfo?.lastName}`,
-      emailUser: userStore.userInfo?.email,
-      idUser: userStore.uid,
+      nameUser: userTitle.value.fullName,
+      emailUser: userTitle.value.email,
+      idUser: userId,
       nameProduct: props.productName,
       timeEvaluation: new Date().toISOString(),
       star: reviewStar.value,
     })
 
+    // Lấy ID của đánh giá vừa tạo từ phản hồi API
     const newEvaluationId = response.data.id
 
+    // Nếu đánh giá mới có ID hợp lệ, thêm vào danh sách đánh giá của sản phẩm
     if (newEvaluationId) {
       await axios.post(
         `http://localhost:5121/api/products/${props.productId}/add-evaluation`,
@@ -132,25 +166,27 @@ const submitReview = async () => {
     }
 
     alert('Đánh giá đã được gửi!')
+    // Reset nội dung đánh giá sau khi gửi thành công
     reviewContent.value = ''
     reviewStar.value = 0
     hoverStar.value = 0
+
+    // Tải lại danh sách đánh giá
     fetchEvaluations()
   } catch (error) {
     console.error('Lỗi khi gửi đánh giá:', error)
     alert('Có lỗi xảy ra khi gửi đánh giá.')
   } finally {
+    // Gửi sự kiện reload dữ liệu sản phẩm về component cha
     emit('reloadProduct')
     isSubmitting.value = false
   }
 }
 
-onMounted(() => {
-  if (!userStore.userInfo) {
-    userStore.fetchUserInfo()
-  }
-})
+// Khi component được mounted, kiểm tra và lấy thông tin user nếu chưa có
+onMounted(() => {})
 </script>
+
   
   <style scoped>
 .review-container {

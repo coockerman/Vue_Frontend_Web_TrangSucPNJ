@@ -3,7 +3,10 @@
     <h2 class="title">{{ title }}</h2>
     <div class="products">
       <div v-for="product in products" :key="product.id" class="product">
-        <router-link :to="`/user-home/products?type=${encodeURIComponent(product.type)}`">
+        <router-link
+          class="productBody"
+          :to="`/user-home/products?type=${encodeURIComponent(product.type)}`"
+        >
           <img :src="product.image" :alt="product.name" class="product-image" />
           <p class="product-name">{{ product.name }}</p>
         </router-link>
@@ -56,7 +59,9 @@ export default {
   flex-direction: column;
   align-items: center;
 }
-
+.productBody:hover {
+  background-color: #f5f5f5;
+}
 .product-image {
   width: 200px;
   height: 200px;

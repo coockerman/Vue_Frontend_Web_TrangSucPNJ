@@ -57,10 +57,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
-import { useUserStore } from '@/stores/user'
 
-const userStore = useUserStore()
-const userId = userStore.uid // Lấy UID từ store
+const userId = localStorage.getItem('uid') // Lấy UID từ store
 const addresses = ref([])
 const newAddress = ref({ city: '', country: '', street: '' })
 const editingAddress = ref(null) // Địa chỉ đang chỉnh sửa
