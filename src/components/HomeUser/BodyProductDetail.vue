@@ -144,7 +144,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 import ProductTitle from './BodyProductDetail/ProductTitle.vue'
@@ -159,6 +159,7 @@ const selectedSizePrice = ref(0)
 const quantity = ref(1)
 const activeTab = ref('description')
 const reviews = ref([]) // Danh sách đánh giá từ API
+const productId = ref(route.query.id)
 
 const isFavorite = ref(false) // Trạng thái yêu thích sản phẩm
 const userId = localStorage.getItem('uid') // ID user giả lập, có thể thay bằng user từ store hoặc auth
@@ -248,6 +249,28 @@ const toggleFavorite = async () => {
     console.error('Lỗi khi cập nhật sản phẩm yêu thích:', error)
   }
 }
+
+// Hàm tải lại thông tin sản phẩm
+const loadProduct = (id) => {
+  console.log('Load product with ID:', id)
+  // Gọi API lấy dữ liệu sản phẩm mới
+  fetchProduct()
+}
+
+// Khi route.query.id thay đổi, cập nhật lại dữ liệu
+watch(
+  () => route.query.id,
+  (newId) => {
+    if (newId) {
+      productId.value = newId
+      loadProduct(newId)
+    }
+  }
+)
+
+// Gọi lần đầu khi component được tạo
+loadProduct(productId.value)
+
 onMounted(fetchProduct)
 
 const changeImage = (newImage) => {

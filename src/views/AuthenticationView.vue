@@ -3,7 +3,7 @@
     <router-link :to="'/user-home'" class="logo-section">
       <h2>Trang chủ</h2>
       <div>
-        <img src="@/assets/Img/Logo.png" alt="PNJ Logo" class="logo" />
+        <img src="@/assets/Img/logoPNJChuan.png" alt="PNJ Logo" class="logo" />
       </div>
     </router-link>
 

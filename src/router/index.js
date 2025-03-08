@@ -19,6 +19,9 @@ import BodyFailPayment from '@/components/HomeUser/BodyFailPayment.vue'
 import BodyListPurchased from '@/components/HomeUser/BodyListPurchased.vue'
 import BodyListFavourite from '@/components/HomeUser/BodyListFavourite.vue'
 import BodyOrderList from '@/components/HomeUser/BodyOrderList.vue'
+import BodyManagerChat from '@/components/HomeAdmin/BodyManagerChat.vue'
+import BodyCoupon from '@/components/HomeAdmin/BodyCoupon.vue'
+import BodyManagerAdvertisement from '@/components/HomeAdmin/BodyManagerAdvertisement.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -57,6 +60,21 @@ const router = createRouter({
           path: 'managerRevenue',
           name: 'managerRevenue',
           component: BodyManagerRevenue,
+        },
+        {
+          path: 'managerChat',
+          name: 'managerChat',
+          component: BodyManagerChat,
+        },
+        {
+          path: 'managerCoupon',
+          name: 'managerCoupon',
+          component: BodyCoupon,
+        },
+        {
+          path: 'managerAdvertisement',
+          name: 'managerAdvertisement',
+          component: BodyManagerAdvertisement,
         },
       ],
     },

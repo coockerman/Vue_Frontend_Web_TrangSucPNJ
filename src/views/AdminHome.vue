@@ -19,8 +19,17 @@
           <li>Xem doanh thu</li>
         </router-link>
 
-        <li @click="navigate('reviews')">Quản lý đánh giá</li>
-        <li @click="navigate('ads')">Quản lý quảng cáo</li>
+        <router-link :to="'/admin-home/managerChat/'">
+          <li>Hỗ trợ khách hàng</li>
+        </router-link>
+
+        <router-link :to="'/admin-home/managerCoupon/'">
+          <li>Quản lý mã giảm giá</li>
+        </router-link>
+
+        <router-link :to="'/admin-home/managerAdvertisement/'">
+          <li>Quản lý quảng cáo</li>
+        </router-link>
       </ul>
     </aside>
     <main class="content">

@@ -4,12 +4,27 @@
       <!-- Logo -->
       <div class="logo">
         <router-link to="/user-home">
-          <img src="/src/assets/Img/Logo.png" alt="PNJ" />
+          <img src="/src/assets/Img/logo.png" alt="PNJ" />
         </router-link>
       </div>
 
       <!-- Search Bar -->
-      <input type="text" placeholder="Search for products..." class="search-bar" />
+      <div class="search-container">
+        <input
+          type="text"
+          v-model="searchKeyword"
+          @input="searchProducts"
+          @click="showSearchResults = true"
+          placeholder="Tìm kiếm sản phẩm..."
+          class="search-bar"
+        />
+        <!-- Dropdown kết quả -->
+        <ul v-if="showSearchResults && searchResults.length" class="search-results">
+          <li v-for="product in searchResults" :key="product.id" @click="goToProduct(product.id)">
+            {{ product.nameProduct }}
+          </li>
+        </ul>
+      </div>
 
       <!-- Menu Items -->
       <div class="menu">
@@ -30,11 +45,7 @@
           <!-- Bảng chọn -->
           <div class="dropdown">
             <template v-if="isLoggedIn">
-              <button>
-                <router-link class="text-normal" :to="'/user-home/userProfile'"
-                  >Thông tin cá nhân</router-link
-                >
-              </button>
+              <button class="text-normal" @click="goToProfile">Thông tin cá nhân</button>
               <button @click="goToPurchased">Sản phẩm đã mua</button>
               <button @click="goToOrderList">Xem đơn hàng</button>
               <button @click="logout">Đăng xuất</button>
@@ -52,13 +63,18 @@
 
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from 'axios'
 
 const router = useRouter()
 const dropdownOpen = ref(false)
 const isLoggedIn = ref(false)
 
+// Dữ liệu cho thanh tìm kiếm
+const searchKeyword = ref('')
+const searchResults = ref([])
+const showSearchResults = ref(false) // Điều khiển hiển thị danh sách tìm kiếm
 // Kiểm tra token khi component được tạo
 onMounted(() => {
   console.log(localStorage.getItem('userRole'))
@@ -67,12 +83,48 @@ onMounted(() => {
   isLoggedIn.value = localStorage.getItem('userRole') === 'user'
 })
 
+// API Search
+const searchProducts = async () => {
+  if (!searchKeyword.value.trim()) {
+    searchResults.value = []
+    showSearchResults.value = false
+    return
+  }
+
+  try {
+    const response = await axios.get(
+      `http://localhost:5121/api/products/search?name=${searchKeyword.value}`
+    )
+    searchResults.value = response.data
+    showSearchResults.value = searchResults.value.length > 0
+  } catch (error) {
+    searchResults.value = []
+    showSearchResults.value = false
+  }
+}
+
+const goToProduct = (idGet) => {
+  console.log(idGet) // Đảm bảo ID hợp lệ trước khi chuyển trang
+  router.push({
+    name: 'productDetail',
+    query: { id: idGet },
+  })
+  searchResults.value = [] // Ẩn danh sách tìm kiếm sau khi nhấp vào sản phẩm
+}
+
+// Xử lý khi nhấn ra ngoài
+const handleClickOutside = (event) => {
+  if (!event.target.closest('.search-container')) {
+    showSearchResults.value = false
+  }
+}
+
 const toggleDropdown = () => {
   dropdownOpen.value = !dropdownOpen.value
 }
 
 const goToProfile = () => {
-  router.push('/profile') // Chuyển hướng đến trang thông tin cá nhân
+  router.push('/user-home/userProfile') // Chuyển hướng đến trang thông tin cá nhân
   dropdownOpen.value = false
 }
 const goToPurchased = () => {
@@ -96,6 +148,15 @@ const goToLogin = () => {
   router.push('/authentication')
   dropdownOpen.value = false
 }
+
+// Gắn và gỡ bỏ sự kiện khi component mount/unmount
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 
@@ -115,16 +176,6 @@ const goToLogin = () => {
 /* Logo */
 .logo img {
   width: 120px;
-}
-
-/* Search Bar */
-.search-bar {
-  flex: 1;
-  max-width: 50%;
-  padding: 10px 15px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 14px;
 }
 
 /* Menu */
@@ -230,8 +281,68 @@ const goToLogin = () => {
   background: #f5f5f5;
 }
 .text-normal {
-  font-size: 10px;
+  font-weight: bold;
+  font-size: 12px;
   color: black;
+}
+
+.search-container {
+  position: relative;
+  width: 100%; /* Chiếm hết chiều ngang */
+  max-width: 600px; /* Độ dài tối đa */
+}
+
+.search-bar {
+  width: 95%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+}
+
+.search-bar:focus {
+  border-color: #007bff;
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 95%;
+  background: white;
+  border: 1px solid #ccc;
+  border-top: none;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.search-results li {
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.search-results li:hover {
+  background: #f0f0f0;
+}
+/* Xóa màu xanh của router-link */
+.router-link-active,
+.router-link-exact-active {
+  color: inherit !important;
+  background: #ffffff;
+}
+
+/* Khi hover vào router-link */
+.router-link-active:hover,
+.router-link-exact-active:hover {
+  background-color: #ddd !important; /* Đổi màu nền */
+  color: inherit !important; /* Giữ nguyên màu chữ */
 }
 </style>
 

@@ -1,13 +1,19 @@
 <template>
   <div class="payment-success">
-    <h1>Thanh toán thành công!</h1>
-    <p>Đơn hàng của bạn đã được xử lý. Cảm ơn bạn đã mua sắm!</p>
-    <p><strong>Mã đơn hàng:</strong> {{ orderId }}</p>
-    <router-link to="/user-home">Quay lại trang chủ</router-link>
+    <div class="content">
+      <h1>🎉 Thanh toán thành công!</h1>
+      <p>Đơn hàng của bạn đã được xử lý. Cảm ơn bạn đã mua sắm! 🛒</p>
+
+      <div v-if="loading" class="loading-spinner"></div>
+      <p v-else-if="error" class="error-message">{{ error }}</p>
+      <p v-else><strong>Mã đơn hàng:</strong> {{ orderId }}</p>
+
+      <router-link to="/user-home" class="home-button">🏠 Quay lại trang chủ</router-link>
+    </div>
   </div>
 </template>
-  
-  <script>
+
+<script>
 import axios from 'axios'
 
 export default {
@@ -42,11 +48,74 @@ export default {
   },
 }
 </script>
-  
-  <style scoped>
+
+<style scoped>
 .payment-success {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Chiếm toàn bộ chiều cao màn hình */
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  color: white;
   text-align: center;
-  padding: 20px;
+}
+
+.content {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 30px;
+  border-radius: 10px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+p {
+  font-size: 18px;
+  margin: 10px 0;
+}
+
+.error-message {
+  color: #ff4d4f;
+  font-weight: bold;
+}
+
+.loading-spinner {
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.home-button {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: white;
+  color: #4facfe;
+  font-weight: bold;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.home-button:hover {
+  background: #ddd;
 }
 </style>
-  
