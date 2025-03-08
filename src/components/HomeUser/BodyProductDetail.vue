@@ -42,6 +42,7 @@
 
       <div class="product-info">
         <h1 class="product-title">{{ product.nameProduct }}</h1>
+
         <div class="rating">
           <span class="stars">
             <span v-for="star in Math.floor(averageRating)" :key="star">⭐</span>
@@ -49,6 +50,11 @@
             <span v-for="star in 5 - Math.ceil(averageRating)" :key="'empty' + star">☆</span>
           </span>
           <span class="rating-score">{{ averageRating.toFixed(1) }}/5</span>
+          <div class="title-container">
+            <button @click="toggleFavorite" class="favorite-btn">
+              <span :class="{ favorited: isFavorite }">❤</span>
+            </button>
+          </div>
         </div>
 
         <div class="price-section">
@@ -153,6 +159,9 @@ const selectedSizePrice = ref(0)
 const quantity = ref(1)
 const activeTab = ref('description')
 const reviews = ref([]) // Danh sách đánh giá từ API
+
+const isFavorite = ref(false) // Trạng thái yêu thích sản phẩm
+const userId = localStorage.getItem('uid') // ID user giả lập, có thể thay bằng user từ store hoặc auth
 const reviewCount = computed(() => reviews.value.length)
 const averageRating = computed(() => {
   if (reviewCount.value === 0) return 0
@@ -178,6 +187,9 @@ const fetchProduct = async () => {
 
     // Gọi API lấy đánh giá
     fetchReviews()
+
+    // Kiểm tra sản phẩm có trong danh sách yêu thích không
+    checkFavoriteStatus(productId)
   } catch (error) {
     console.error('Lỗi tải sản phẩm:', error)
   }
@@ -204,6 +216,36 @@ const fetchReviews = async () => {
     reviews.value = response.data || []
   } catch (error) {
     console.error('❌ Lỗi khi lấy đánh giá:', error.response ? error.response.data : error.message)
+  }
+}
+// Kiểm tra sản phẩm có trong danh sách yêu thích không
+const checkFavoriteStatus = async (productId) => {
+  try {
+    const response = await axios.get(`http://localhost:5121/api/users/${userId}/favourites`)
+    isFavorite.value = response.data.includes(productId)
+  } catch (error) {
+    console.error('Lỗi khi kiểm tra sản phẩm yêu thích:', error)
+  }
+}
+
+// Hàm thêm hoặc xoá sản phẩm khỏi danh sách yêu thích
+const toggleFavorite = async () => {
+  if (!product.value) return
+
+  try {
+    if (isFavorite.value) {
+      await axios.delete(
+        `http://localhost:5121/api/users/${userId}/favourites/remove/${product.value.id}`
+      )
+      isFavorite.value = false
+    } else {
+      await axios.post(
+        `http://localhost:5121/api/users/${userId}/favourites/add/${product.value.id}`
+      )
+      isFavorite.value = true
+    }
+  } catch (error) {
+    console.error('Lỗi khi cập nhật sản phẩm yêu thích:', error)
   }
 }
 onMounted(fetchProduct)
@@ -581,6 +623,17 @@ const addToCard = async () => {
 .type-text {
   color: rgb(64, 64, 64);
   font-weight: bold;
+}
+
+.favorite-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: gray;
+}
+.favorited {
+  color: red;
 }
 </style>
 

@@ -14,7 +14,7 @@
       <!-- Menu Items -->
       <div class="menu">
         <router-link :to="`/user-home/products`"> TRANG SỨC </router-link>
-        <router-link to="#">GIFTS</router-link>
+        <router-link :to="`/user-home/listFavourite`">YÊU THÍCH</router-link>
         <router-link to="#">SALE</router-link>
 
         <!-- Nút giỏ hàng -->

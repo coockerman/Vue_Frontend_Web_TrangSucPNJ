@@ -64,7 +64,8 @@
         <p><strong>Sản phẩm:</strong></p>
         <ul>
           <li v-for="item in selectedOrder.productItems" :key="item.idProductNow">
-            {{ item.name }} - {{ item.stock }} x {{ item.price.toLocaleString() }}đ
+            {{ item.name }} size {{ item.size }} số lượng {{ item.stock }} x
+            {{ item.price.toLocaleString() }}đ
           </li>
         </ul>
 

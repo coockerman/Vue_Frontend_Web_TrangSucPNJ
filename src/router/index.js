@@ -7,6 +7,7 @@ import BodyListProduct from '@/components/HomeUser/BodyListProduct.vue'
 import BodyListProductByCollection from '@/components/HomeUser/BodyListProductByCollection.vue'
 import BodyListProductByCombo from '@/components/HomeUser/BodyListProductByCombo.vue'
 import BodyManagerProduct from '@/components/HomeAdmin/BodyManagerProduct.vue'
+import BodyManagerRevenue from '@/components/HomeAdmin/BodyManagerRevenue.vue'
 import BodyUserProfile from '@/components/HomeUser/BodyUserProfile.vue'
 import BodyAdminTitle from '@/components/HomeAdmin/BodyAdminTitle.vue'
 import BodyManagerOrder from '@/components/HomeAdmin/BodyManagerOrder.vue'
@@ -16,6 +17,7 @@ import BodyPayment from '@/components/HomeUser/BodyPayment.vue'
 import BodySuccessPayment from '@/components/HomeUser/BodySuccessPayment.vue'
 import BodyFailPayment from '@/components/HomeUser/BodyFailPayment.vue'
 import BodyListPurchased from '@/components/HomeUser/BodyListPurchased.vue'
+import BodyListFavourite from '@/components/HomeUser/BodyListFavourite.vue'
 import BodyOrderList from '@/components/HomeUser/BodyOrderList.vue'
 
 const router = createRouter({
@@ -50,6 +52,11 @@ const router = createRouter({
           path: 'managerOrder',
           name: 'managerOrder',
           component: BodyManagerOrder,
+        },
+        {
+          path: 'managerRevenue',
+          name: 'managerRevenue',
+          component: BodyManagerRevenue,
         },
       ],
     },
@@ -118,6 +125,12 @@ const router = createRouter({
           path: 'listPurchased',
           name: 'listPurchased',
           component: BodyListPurchased,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'listFavourite',
+          name: 'listFavourite',
+          component: BodyListFavourite,
           meta: { requiresAuth: true },
         },
         {

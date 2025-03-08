@@ -15,7 +15,10 @@
           <li>Quản lý đơn hàng</li>
         </router-link>
 
-        <li @click="navigate('revenue')">Xem doanh thu</li>
+        <router-link :to="'/admin-home/managerRevenue/'">
+          <li>Xem doanh thu</li>
+        </router-link>
+
         <li @click="navigate('reviews')">Quản lý đánh giá</li>
         <li @click="navigate('ads')">Quản lý quảng cáo</li>
       </ul>
@@ -68,36 +71,31 @@ export default {
 .admin-container {
   display: flex;
   height: 100vh;
-  overflow-y: auto; /* Ngăn trang bị cuộn theo toàn bộ chiều cao */
-}
-.sidebar h1 {
-  font-size: 20px;
-  font-weight: bold;
-  color: #fff;
-  text-align: center;
-  background: #1c4d3e;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  background: #f4f4f9;
 }
 
 .sidebar {
-  width: 200px; /* Giảm chiều rộng */
-  background: #1f2937;
+  width: 250px;
+  background: linear-gradient(135deg, #1e293b, #314668);
   color: white;
-  padding: 15px;
-  flex-shrink: 0; /* Đảm bảo sidebar không bị thu nhỏ */
-  height: 100vh; /* Chiều cao toàn màn hình */
-  position: fixed; /* Cố định sidebar */
+  padding: 20px;
+  flex-shrink: 0;
+  height: 100vh;
+  position: fixed;
   left: 0;
   top: 0;
   bottom: 0;
+  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease-in-out;
 }
 
-.sidebar h2 {
-  font-size: 18px;
+.sidebar h1 {
+  font-size: 22px; /* Tăng kích thước chữ */
+  font-weight: bold;
+  color: #f4fbca;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 40px;
+  text-transform: uppercase;
 }
 
 .sidebar ul {
@@ -107,32 +105,41 @@ export default {
 }
 
 .sidebar li {
-  padding: 12px;
+  font-size: 16px; /* Tăng kích thước chữ */
+  font-weight: bold; /* In đậm chữ */
+  padding: 14px;
   cursor: pointer;
-  transition: background 0.3s ease;
-  border-radius: 5px;
+  transition: background 0.3s ease, transform 0.2s;
+  border-radius: 8px;
 }
 
 .sidebar li:hover {
-  background: #374151;
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05); /* Hiệu ứng phóng to nhẹ khi hover */
+}
+
+.sidebar a {
+  color: white;
+  text-decoration: none;
+  display: block;
 }
 
 .content {
   flex: 1;
+  margin-left: 250px;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  margin-left: 200px; /* Điều chỉnh phù hợp với sidebar */
-  height: 100vh;
-  overflow-y: auto;
 }
 
 .topbar {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  padding: 10px 20px;
-  background: #111827;
-  height: 60px;
+  padding: 15px 20px;
+  background: #1e293b;
+  color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .user-menu {
@@ -155,9 +162,9 @@ export default {
   right: 0;
   background: white;
   padding: 10px;
-  border-radius: 5px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  min-width: 120px;
+  border-radius: 6px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+  min-width: 140px;
   z-index: 10;
 }
 
@@ -168,15 +175,16 @@ export default {
   background: transparent;
   cursor: pointer;
   text-align: left;
+  transition: background 0.3s;
 }
 
 .dropdown-menu button:hover {
-  background: #f3f4f6;
+  background: #e5e7eb;
 }
 
 .page-content {
   flex: 1;
-  padding: 20px;
-  overflow-y: auto; /* Kích hoạt cuộn nội dung */
+  padding: 25px;
+  overflow-y: auto;
 }
 </style>

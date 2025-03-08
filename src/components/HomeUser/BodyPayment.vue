@@ -12,7 +12,7 @@
           alt="Product Image"
         />
         <div>
-          <p class="product-name">{{ products[item.idProduct]?.nameProduct }}</p>
+          <p class="product-name tooltip">{{ products[item.idProduct]?.nameProduct }}</p>
           <p class="product-code">Size: {{ item.size }}</p>
         </div>
         <p class="quantity">Số lượng: {{ item.stock }}</p>
@@ -116,18 +116,18 @@
     </div>
 
     <!-- Phương thức thanh toán -->
-    <div class="checkout-container-payment">
+    <div v-if="deliveryMethod === 'home'" class="checkout-container-payment">
       <!-- Đồng ý điều khoản -->
       <div class="agreement">
         <input type="checkbox" id="agreeTerms" v-model="agreeTerms" />
-        <label for="agreeTerms">
+        <div for="agreeTerms">
           Tôi đồng ý cho PNJ thu thập, xử lý dữ liệu cá nhân của tôi theo quy định tại
           <a href="#">Thông báo này</a> và theo quy định của pháp luật
-        </label>
+        </div>
       </div>
 
       <!-- Phương thức thanh toán -->
-      <div v-if="deliveryMethod === 'home'" class="payment-methods">
+      <div class="payment-methods">
         <h3>Phương thức thanh toán</h3>
         <div v-for="method in paymentMethods" :key="method.id" class="payment-option">
           <input type="radio" :id="method.id" v-model="selectedPayment" :value="method.id" />
@@ -139,6 +139,8 @@
         </div>
       </div>
 
+      <!-- Hiển thị cảnh báo nếu không phải PayPal -->
+      <div v-if="showAlert" class="alert">⚠️ Phương thức thanh toán này chưa được hỗ trợ!</div>
       <!-- Ghi chú đơn hàng -->
       <div class="order-note">
         <h3>Ghi chú đơn hàng <span class="optional">(Không bắt buộc)</span></h3>
@@ -191,7 +193,13 @@ const selectedPayment = ref('cod')
 const orderNote = ref('')
 
 const paymentMethods = ref([
-  { id: 'cod', name: 'Thanh toán tiền mặt khi nhận hàng (COD)', icon: 'cod-icon.png' },
+  {
+    id: 'paypal',
+    name: 'Thanh toán quốc tế qua Paypal',
+    icon: '/src/assets/LogoPayment/paypal.png',
+  },
+  { id: 'vnpay', name: 'Thanh toán VNPAY', icon: 'vnpay-icon.png' },
+  { id: 'momo', name: 'Thanh toán bằng ví MoMo', icon: 'momo-icon.png' },
   { id: 'bank', name: 'Thanh toán chuyển khoản', icon: 'bank-icon.png' },
   {
     id: 'visa',
@@ -199,9 +207,6 @@ const paymentMethods = ref([
     description: 'VISA, Master, JCB',
     icon: 'visa-icon.png',
   },
-  { id: 'credit', name: 'Trả góp thẻ tín dụng 0%', icon: 'credit-icon.png' },
-  { id: 'vnpay', name: 'Thanh toán VNPAY', icon: 'vnpay-icon.png' },
-  { id: 'momo', name: 'Thanh toán bằng ví MoMo', icon: 'momo-icon.png' },
   { id: 'qr', name: 'Quét mã QR', icon: 'qr-icon.png' },
   { id: 'zalopay', name: 'Thanh toán Zalopay - QR đa năng', icon: 'zalopay-icon.png' },
 ])
@@ -345,6 +350,8 @@ const fetchProduct = async (idProduct) => {
     }
   }
 }
+// Nếu selectedPayment không phải 'paypal' thì hiển thị cảnh báo
+const showAlert = computed(() => selectedPayment.value !== 'paypal')
 
 const subTotal = computed(() => {
   return cartItems.value.reduce((total, item) => {
@@ -371,6 +378,10 @@ const setDeliveryMethod = (method) => {
 }
 
 const placeOrder = () => {
+  if (showAlert.value) {
+    alert('Phương thức thanh toán này chưa được hỗ trợ')
+    return
+  }
   if (!agreeTerms.value) {
     alert('Bạn cần đồng ý với điều khoản trước khi đặt hàng.')
     return
@@ -424,6 +435,7 @@ onMounted(async () => {
 }
 
 .product-name {
+  max-width: 400px;
   font-weight: bold;
   white-space: nowrap;
   overflow: hidden;
@@ -541,7 +553,7 @@ onMounted(async () => {
   padding: 10px;
   border: none;
   cursor: pointer;
-  background: #f4f4f4;
+  background: #c5c5c5;
 }
 
 .delivery-options .active {
@@ -718,11 +730,14 @@ h2 {
   margin-bottom: 12px;
 }
 
-label {
+.payment-option label {
   font-weight: bold;
-  display: block;
+  display: flex;
+  align-items: center; /* Căn giữa theo chiều dọc */
+  justify-content: center; /* Căn giữa theo chiều ngang (nếu cần) */
   margin-bottom: 5px;
 }
+
 .form-group input,
 select {
   width: 100%;
@@ -751,6 +766,45 @@ select {
   font-size: 16px;
   font-weight: 500;
   color: #333;
+}
+
+.tooltip:hover::after {
+  content: attr(title); /* Lấy nội dung từ chính thẻ */
+  position: absolute;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  white-space: nowrap;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 120%;
+  z-index: 10;
+  visibility: visible;
+  opacity: 1;
+}
+
+.tooltip:hover {
+  overflow: visible;
+  white-space: normal;
+}
+
+.tooltip::after {
+  content: '';
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.alert {
+  margin-top: 15px;
+  padding: 10px;
+  background: #ffebeb;
+  color: #d9534f;
+  border: 1px solid #d9534f;
+  border-radius: 5px;
+  font-weight: bold;
+  text-align: center;
 }
 </style>
   

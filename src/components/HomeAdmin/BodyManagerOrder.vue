@@ -57,7 +57,8 @@
         <p><strong>Sản phẩm:</strong></p>
         <ul>
           <li v-for="item in selectedOrder.productItems" :key="item.idProductNow">
-            {{ item.name }} - {{ item.stock }} x {{ item.price.toLocaleString() }}đ
+            {{ item.name }} size {{ item.size }} số lượng {{ item.stock }} x
+            {{ item.price.toLocaleString() }}đ
           </li>
         </ul>
         <p><strong>Tổng tiền:</strong> {{ selectedOrder.totalAmount.toLocaleString() }}đ</p>
@@ -245,7 +246,7 @@ button:active {
   background: white;
   padding: 20px;
   border-radius: 10px;
-  width: 400px;
+  width: 500px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 </style>
