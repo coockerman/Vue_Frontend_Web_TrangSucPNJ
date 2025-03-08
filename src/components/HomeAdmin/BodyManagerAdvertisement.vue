@@ -10,13 +10,15 @@
       <label>Tên quảng cáo:</label>
       <input v-model="advertisement.name" placeholder="Nhập tên" class="input" />
 
-      <label>URL hình ảnh:</label>
+      <label>URL hình ảnh (Nhập hoặc tải ảnh):</label>
       <input
         v-model="advertisement.urlImage"
         placeholder="Nhập URL hình ảnh"
         class="input"
         @input="previewImage"
       />
+
+      <input type="file" @change="uploadImage" class="file-input" />
 
       <div v-if="advertisement.urlImage">
         <p>Xem trước ảnh:</p>
@@ -52,6 +54,8 @@
 </template>
   
   <script>
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { storage } from '@/firebaseStorage' // Đảm bảo bạn đã cấu hình Firebase trong dự án
 import axios from 'axios'
 
 export default {
@@ -66,7 +70,7 @@ export default {
     }
   },
   methods: {
-    // Tải danh sách quảng cáo
+    // Lấy danh sách quảng cáo
     async fetchAdvertisements() {
       try {
         const res = await axios.get('http://localhost:5121/api/advertisements/all')
@@ -83,7 +87,7 @@ export default {
           'http://localhost:5121/api/advertisements/create-or-update',
           this.advertisement
         )
-        this.fetchAdvertisements() // Cập nhật danh sách
+        this.fetchAdvertisements()
         this.resetForm()
       } catch (error) {
         console.error('Lỗi khi lưu quảng cáo', error)
@@ -109,7 +113,22 @@ export default {
 
     // Xem trước hình ảnh khi nhập URL
     previewImage() {
-      // Không cần làm gì, vì Vue sẽ tự động cập nhật ảnh thông qua v-model
+      // Vue sẽ tự động cập nhật ảnh nhờ v-model
+    },
+
+    // Tải ảnh lên Firebase Storage
+    async uploadImage(event) {
+      const file = event.target.files[0]
+      if (!file) return
+
+      try {
+        const storageRef = ref(storage, `advertisements/${file.name}`)
+        await uploadBytes(storageRef, file)
+        const url = await getDownloadURL(storageRef)
+        this.advertisement.urlImage = url // Cập nhật URL ảnh vào form
+      } catch (error) {
+        console.error('Lỗi khi tải ảnh lên', error)
+      }
     },
 
     // Reset form
@@ -139,7 +158,8 @@ h3 {
   gap: 10px;
   margin-bottom: 20px;
 }
-.input {
+.input,
+.file-input {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 5px;

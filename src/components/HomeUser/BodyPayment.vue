@@ -153,6 +153,11 @@
       <!-- Nút đặt hàng -->
       <button class="order-button" @click="placeOrder">Đặt hàng</button>
     </div>
+    <!-- Loading Overlay -->
+    <div v-if="isLoading" class="overlay">
+      <div class="spinner"></div>
+      <p>Đang xử lý thanh toán...</p>
+    </div>
   </div>
 </template>
   
@@ -163,6 +168,7 @@ import axios from 'axios'
 const cartItems = ref([])
 const products = ref({})
 const couponCode = ref('')
+const isLoading = ref(false)
 
 const user = ref({
   fullName: '',
@@ -198,17 +204,20 @@ const paymentMethods = ref([
     name: 'Thanh toán quốc tế qua Paypal',
     icon: '/src/assets/LogoPayment/paypal.png',
   },
-  { id: 'vnpay', name: 'Thanh toán VNPAY', icon: 'vnpay-icon.png' },
-  { id: 'momo', name: 'Thanh toán bằng ví MoMo', icon: 'momo-icon.png' },
-  { id: 'bank', name: 'Thanh toán chuyển khoản', icon: 'bank-icon.png' },
+  { id: 'vnpay', name: 'Thanh toán VNPAY', icon: '/src/assets/LogoPayment/vnpay.png' },
+  { id: 'momo', name: 'Thanh toán bằng ví MoMo', icon: '/src/assets/LogoPayment/momo.png' },
   {
     id: 'visa',
     name: 'Thanh toán thẻ quốc tế',
     description: 'VISA, Master, JCB',
-    icon: 'visa-icon.png',
+    icon: '/src/assets/Logo/MasterCard.png',
   },
-  { id: 'qr', name: 'Quét mã QR', icon: 'qr-icon.png' },
-  { id: 'zalopay', name: 'Thanh toán Zalopay - QR đa năng', icon: 'zalopay-icon.png' },
+  { id: 'qr', name: 'Quét mã QR', icon: '/src/assets/LogoPayment/qr.png' },
+  {
+    id: 'zalopay',
+    name: 'Thanh toán Zalopay - QR đa năng',
+    icon: '/src/assets/LogoPayment/zalopay.png',
+  },
 ])
 
 // Danh sách mã giảm giá (giả lập)
@@ -254,7 +263,7 @@ const fetpayment = async () => {
       alert('Bạn cần đăng nhập trước khi thanh toán')
       return
     }
-
+    isLoading.value = true // Hiển thị overlay loading
     const formData = {
       id: '', // ID đơn hàng, có thể để trống vì BE sẽ tự sinh
       productItems: [], // Danh sách sản phẩm, hiện tại có thể để trống
@@ -299,6 +308,8 @@ const fetpayment = async () => {
   } catch (error) {
     console.error(error)
     alert('Có lỗi xảy ra, vui lòng thử lại.')
+  } finally {
+    //isLoading.value = false // Ẩn overlay loading
   }
 }
 
@@ -805,6 +816,43 @@ select {
   border-radius: 5px;
   font-weight: bold;
   text-align: center;
+}
+
+/* Overlay toàn màn hình */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  color: white;
+  font-size: 20px;
+  z-index: 9999;
+}
+
+/* Hiệu ứng loading */
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(255, 255, 255, 0.3);
+  border-top: 5px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>
   
