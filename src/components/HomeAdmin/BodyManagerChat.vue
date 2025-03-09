@@ -37,15 +37,15 @@
     </table>
   </div>
 </template>
-  
-  <script>
+
+<script>
 import axios from 'axios'
 
 export default {
   data() {
     return {
       chats: [],
-      chat: { question: '', result: '' },
+      chat: { id: '0', question: '', result: '', stats: '0' },
       editingChat: null,
     }
   },
@@ -55,14 +55,28 @@ export default {
       this.chats = res.data
     },
     async saveChat() {
-      if (this.editingChat) {
-        await axios.patch(`http://localhost:5121/api/chat/update/${this.editingChat.id}`, this.chat)
+      // Hiển thị hộp thoại xác nhận trước khi thêm mới hoặc cập nhật câu hỏi
+      const isConfirmed = confirm('Bạn có chắc chắn muốn lưu thay đổi?');
+
+      if (isConfirmed) {
+        if (this.editingChat) {
+          // Nếu đang chỉnh sửa, thực hiện PATCH
+          await axios.patch(`http://localhost:5121/api/chat/update/${this.editingChat.id}`, this.chat);
+        } else {
+          // Nếu không chỉnh sửa, thực hiện POST để thêm câu hỏi mới
+          await axios.post('http://localhost:5121/api/chat/add', this.chat);
+        }
+        // Reset lại form và state
+        this.chat = { id: '0', question: '', result: '', stats: '0' };
+        this.editingChat = null;
+
+        // Lấy lại danh sách câu hỏi mới
+        this.fetchChats();
       } else {
-        await axios.post('http://localhost:5121/api/chat/add', this.chat)
+        this.chat = { id: '0', question: '', result: '', stats: '0' };
+        this.editingChat = null;
+        console.log('Thao tác bị hủy.');
       }
-      this.chat = { question: '', result: '' }
-      this.editingChat = null
-      this.fetchChats()
     },
     editChat(chat) {
       this.chat = { ...chat }
@@ -73,8 +87,13 @@ export default {
       this.editingChat = null
     },
     async deleteChat(id) {
-      await axios.delete(`/api/chat/delete/${id}`)
-      this.fetchChats()
+      const confirmDelete = confirm("Bạn có chắc chắn muốn xoá câu hỏi này không?");
+      if (confirmDelete) {
+        // Gọi API để xoá
+        await axios.delete(`http://localhost:5121/api/chat/delete/${id}`);
+        // Sau khi xoá, làm mới danh sách câu hỏi
+        this.fetchChats();
+      }
     },
   },
   mounted() {
@@ -82,8 +101,8 @@ export default {
   },
 }
 </script>
-  
-  <style>
+
+<style>
 .input {
   display: block;
   width: 100%;
@@ -198,4 +217,3 @@ export default {
   padding: 12px;
 }
 </style>
-  
