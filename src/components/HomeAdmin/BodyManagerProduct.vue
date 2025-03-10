@@ -38,7 +38,7 @@
 
       <label>Karat:</label>
       <select v-model="formData.karat" required>
-        <option value="">null</option>
+        <option value=" ">null</option>
         <option value="10K">10K</option>
         <option value="14K">14K</option>
         <option value="18K">18K</option>
@@ -72,13 +72,13 @@
       <h3>Kích cỡ & Giá</h3>
       <div v-for="(sizeItem, index) in formData.sizePrice" :key="index" class="size-item">
         <label>Size:</label>
-        <input v-model.number="sizeItem.size" type="number" required />
+        <input v-model.number="sizeItem.size" type="number" min="0" required />
 
         <label>Giá:</label>
-        <input v-model.number="sizeItem.price" type="number" required />
+        <input v-model.number="sizeItem.price" min="0" type="number" required />
 
         <label>Tồn kho:</label>
-        <input v-model.number="sizeItem.stock" type="number" required />
+        <input v-model.number="sizeItem.stock" min="0" type="number" required />
 
         <button type="button" @click="removeSize(index)" v-if="formData.sizePrice.length > 1">
           Xóa
