@@ -5,11 +5,11 @@
     <form @submit.prevent="handleRegister">
       <div class="input-group">
         <label class="label-text2">Full Name</label>
-        <input type="text" v-model="fullName" required placeholder="Enter your full name" />
+        <input type="text" v-model.trim="fullName" required placeholder="Enter your full name" />
       </div>
       <div class="input-group">
         <label class="label-text2">Email Address</label>
-        <input type="email" v-model="email" required placeholder="Enter your email" />
+        <input type="email" v-model.trim="email" required placeholder="Enter your email" />
       </div>
       <div class="input-group">
         <label class="label-text2">Password</label>
@@ -23,8 +23,11 @@
         </label>
       </div>
 
-      <button type="submit" :disabled="!agreeToTerms">Sign Up</button>
+      <button type="submit" :disabled="!agreeToTerms || isSubmitting">
+        {{ isSubmitting ? 'Signing Up...' : 'Sign Up' }}
+      </button>
       <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+      <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
     </form>
     <p class="login-link">
       Already have an account?
@@ -47,15 +50,90 @@ export default {
     const password = ref('')
     const agreeToTerms = ref(false)
     const errorMessage = ref('')
+    const successMessage = ref('')
+    const isSubmitting = ref(false)
     const router = useRouter()
 
+    const validatePassword = (pwd) => {
+      if (pwd.length < 6) return 'Mật khẩu không được ngắn hơn 6 ký tự.'
+      if (!/[A-Z]/.test(pwd)) return 'Mật khẩu phải chứa ít nhất một chữ cái hoa.'
+      if (!/[0-9]/.test(pwd)) return 'Mật khẩu phải chứa ít nhất một số.'
+      return ''
+    }
+
     const handleRegister = async () => {
-      if (!agreeToTerms.value) {
-        errorMessage.value = 'You must agree to the Terms & Conditions to register.'
+      // Reset thông báo lỗi và thành công
+      errorMessage.value = ''
+      successMessage.value = ''
+
+      // Trim dữ liệu nhập vào
+      fullName.value = fullName.value.trim()
+      email.value = email.value.trim()
+      password.value = password.value.trim()
+
+      // Kiểm tra Full Name không được để trống
+      if (!fullName.value) {
+        errorMessage.value = 'Tên người dùng không được để trống hoặc chỉ chứa khoảng trắng.'
         return
       }
 
+      if (fullName.value.length < 3) {
+        errorMessage.value = 'Tên người dùng không được ít hơn 3 ký tự'
+        return
+      }
+
+      if (fullName.value.length > 50) {
+        errorMessage.value = 'Tên người dùng không được nhiều hơn 50 ký tự'
+        return
+      }
+
+      // Kiểm tra email không được để trống
+      if (!email.value) {
+        errorMessage.value = 'Email không được để trống hoặc chỉ chứa khoảng trắng.'
+        return
+      }
+
+      if (email.value.length < 12) {
+        errorMessage.value = 'Email không được ít hơn 12 ký tự'
+        return
+      }
+
+      if (email.value.length > 50) {
+        errorMessage.value = 'Email không được nhiều hơn 50 ký tự'
+        return
+      }
+
+      // Kiểm tra email có đúng định dạng không
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+      if (!emailRegex.test(email.value)) {
+        errorMessage.value = 'Email không hợp lệ. Vui lòng nhập đúng định dạng.'
+        return
+      }
+
+      if (!password.value) {
+        errorMessage.value = 'Mật khẩu không được để trống hoặc chỉ chứa khoảng trắng.'
+        return
+      }
+
+      if (password.value.length > 20) {
+        errorMessage.value = 'Mật khẩu không được nhiều hơn 20 ký tự'
+        return
+      }
+
+      // Kiểm tra lỗi mật khẩu
+      errorMessage.value = validatePassword(password.value)
+      if (errorMessage.value) return
+
+      // Kiểm tra nếu chưa đồng ý điều khoản
+      if (!agreeToTerms.value) {
+        errorMessage.value = 'Bạn phải đồng ý với Điều khoản & Dịch vụ để đăng ký.'
+        return
+      }
+
+      isSubmitting.value = true
+
       try {
+        // Đăng ký tài khoản với Firebase Auth
         const userCredential = await createUserWithEmailAndPassword(
           auth,
           email.value,
@@ -63,24 +141,59 @@ export default {
         )
         const user = userCredential.user
 
-        // Lưu thông tin vào Firebase Database
+        // Lưu thông tin người dùng vào Firebase Database
         await set(dbRef(database, `users/${user.uid}`), {
           fullName: fullName.value,
           email: email.value,
-          role: 'user', // Mặc định role là user
+          role: 'user',
         })
 
-        // Chuyển hướng đến trang đăng nhập sau khi đăng ký thành công
-        emit('toggle-form')
+        // Hiển thị thông báo thành công và chuyển trang
+        successMessage.value = 'Đăng ký thành công! Đang chuyển hướng...'
+        setTimeout(() => {
+          emit('toggle-form') // Chuyển sang form đăng nhập
+        }, 2000)
       } catch (error) {
-        errorMessage.value = error.message
+        // Xử lý lỗi từ Firebase Auth
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            errorMessage.value = 'Email đã được sử dụng. Vui lòng thử email khác.'
+            break
+          case 'auth/invalid-email':
+            errorMessage.value = 'Email không hợp lệ. Vui lòng nhập đúng định dạng.'
+            break
+          case 'auth/weak-password':
+            errorMessage.value =
+              'Mật khẩu quá yếu. Vui lòng nhập ít nhất 6 ký tự, bao gồm chữ hoa và số.'
+            break
+          case 'auth/operation-not-allowed':
+            errorMessage.value = 'Chức năng đăng ký hiện đang bị vô hiệu hóa.'
+            break
+          case 'auth/network-request-failed':
+            errorMessage.value = 'Kết nối mạng bị lỗi. Vui lòng kiểm tra internet và thử lại.'
+            break
+          default:
+            errorMessage.value = 'Đã xảy ra lỗi. Vui lòng thử lại sau.'
+        }
+      } finally {
+        isSubmitting.value = false
       }
     }
 
-    return { fullName, email, password, agreeToTerms, handleRegister, errorMessage }
+    return {
+      fullName,
+      email,
+      password,
+      agreeToTerms,
+      handleRegister,
+      errorMessage,
+      successMessage,
+      isSubmitting,
+    }
   },
 }
 </script>
+
 
 <style scoped>
 /* Container */

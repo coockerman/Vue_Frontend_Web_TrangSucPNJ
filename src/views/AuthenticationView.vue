@@ -1,7 +1,6 @@
 <template>
   <div class="auth-container">
     <router-link :to="'/user-home'" class="logo-section">
-      <h2>Trang chủ</h2>
       <div>
         <img src="@/assets/Img/logoPNJChuan.png" alt="PNJ Logo" class="logo" />
       </div>

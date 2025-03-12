@@ -9,17 +9,33 @@
     <form @submit.prevent="handleLogin">
       <div class="input-group">
         <label class="label-text2">Email Address</label>
-        <input type="email" v-model="email" required placeholder="Enter your email" />
+        <input
+          type="email"
+          v-model="email"
+          required
+          placeholder="Enter your email"
+          autocomplete="off"
+          maxlength="50"
+        />
       </div>
       <div class="input-group">
         <label class="label-text2">Password</label>
-        <input type="password" v-model="password" required placeholder="Enter your password" />
+        <input
+          type="password"
+          v-model="password"
+          required
+          placeholder="Enter your password"
+          autocomplete="off"
+          maxlength="20"
+        />
       </div>
       <div class="remember-me">
         <input type="checkbox" v-model="rememberMe" id="rememberMe" />
         <label for="rememberMe" class="label-text2">Remember Me</label>
       </div>
-      <button type="submit">Login</button>
+      <button type="submit" :disabled="isLoading">
+        {{ isLoading ? 'Logging in...' : 'Login' }}
+      </button>
     </form>
 
     <p class="register-link">
@@ -48,11 +64,25 @@ export default {
     const password = ref('')
     const rememberMe = ref(false)
     const errorMessage = ref('')
+    const isLoading = ref(false) // Ngăn spam login
     const router = useRouter()
-    const userStore = useUserStore() // 🔥 Đưa Pinia vào trong setup()
+    const userStore = useUserStore()
 
     const handleLogin = async () => {
       errorMessage.value = ''
+      isLoading.value = true
+
+      // Kiểm tra đầu vào trước khi gửi request
+      if (!email.value.trim()) {
+        errorMessage.value = 'Vui lòng nhập email.'
+        isLoading.value = false
+        return
+      }
+      if (!password.value.trim()) {
+        errorMessage.value = 'Vui lòng nhập mật khẩu.'
+        isLoading.value = false
+        return
+      }
 
       try {
         // Chọn cách lưu đăng nhập
@@ -75,27 +105,26 @@ export default {
 
         if (snapshot.exists()) {
           const role = snapshot.val()
-          localStorage.setItem('userRole', role) // Lưu role để sử dụng
+          localStorage.setItem('userRole', role)
           localStorage.setItem('uid', user.uid)
-          // 🔥 Cập nhật user vào store
+
+          // Cập nhật user vào store
           userStore.setUser({ uid: user.uid, role: role })
 
           // Điều hướng theo vai trò
-          if (role === 'admin') {
-            router.push('/admin-home')
-          } else {
-            router.push('/user-home')
-          }
+          router.push(role === 'admin' ? '/admin-home' : '/user-home')
         } else {
-          errorMessage.value = 'User role not found. Please contact support.'
+          errorMessage.value = 'Không tìm thấy quyền của người dùng. Vui lòng liên hệ hỗ trợ.'
+          localStorage.removeItem('userToken')
         }
       } catch (error) {
+        console.log(error.code)
         switch (error.code) {
           case 'auth/invalid-email':
             errorMessage.value = 'Email không hợp lệ.'
             break
-          case 'auth/user-not-found':
-            errorMessage.value = 'Tài khoản không tồn tại.'
+          case 'auth/invalid-credential':
+            errorMessage.value = 'Tài khoản hoặc mật khẩu không đúng'
             break
           case 'auth/wrong-password':
             errorMessage.value = 'Mật khẩu không đúng.'
@@ -103,16 +132,22 @@ export default {
           case 'auth/too-many-requests':
             errorMessage.value = 'Bạn đã nhập sai quá nhiều lần, thử lại sau.'
             break
+          case 'auth/network-request-failed':
+            errorMessage.value = 'Lỗi mạng, vui lòng kiểm tra kết nối.'
+            break
           default:
             errorMessage.value = 'Đăng nhập thất bại. Vui lòng thử lại.'
         }
+      } finally {
+        isLoading.value = false
       }
     }
 
-    return { email, password, rememberMe, errorMessage, handleLogin }
+    return { email, password, rememberMe, errorMessage, handleLogin, isLoading }
   },
 }
 </script>
+
 
 
 
