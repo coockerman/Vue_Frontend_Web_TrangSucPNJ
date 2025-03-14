@@ -77,6 +77,11 @@ const formatTime = (timestamp) => {
 }
 
 const submitComment = async () => {
+  if (localStorage.getItem('userRole') !== 'user') {
+    alert('Vui lòng đăng nhập trước')
+    return
+  }
+
   if (!commentContent.value) {
     alert('Vui lòng nhập nội dung bình luận!')
     return
