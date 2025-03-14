@@ -40,7 +40,7 @@
         </div>
 
         <!-- Nút tài khoản -->
-        <div class="icon-wrapper">
+        <div class="icon-wrapper" @mouseenter="handleHover">
           <img src="/src/assets/Img/AuthIcon.png" alt="Account" />
           <!-- Bảng chọn -->
           <div class="dropdown">
@@ -82,7 +82,9 @@ onMounted(() => {
   console.log(localStorage.getItem('uid'))
   isLoggedIn.value = localStorage.getItem('userRole') === 'user'
 })
-
+const handleHover = () => {
+  isLoggedIn.value = localStorage.getItem('userRole') === 'user'
+}
 // API Search
 const searchProducts = async () => {
   if (!searchKeyword.value.trim()) {
