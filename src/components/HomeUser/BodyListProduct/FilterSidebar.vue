@@ -85,12 +85,14 @@ const karat = ref('all')
 const gender = ref('all')
 
 const materials = [
+  { label: 'All', value: 'all' },
   { label: 'Vàng trắng', value: 'Vàng trắng' },
   { label: 'Vàng', value: 'Vàng' },
   { label: 'Bạc', value: 'Bạc' },
 ]
 
 const karats = [
+  { label: 'All', value: 'all' },
   { label: '10K', value: '10K' },
   { label: '14K', value: '14K' },
   { label: '18K', value: '18K' },
@@ -98,6 +100,7 @@ const karats = [
 ]
 
 const genders = [
+  { label: 'All', value: 'all' },
   { label: 'Nữ', value: 'Nữ' },
   { label: 'Nam', value: 'Nam' },
   { label: 'Trẻ em', value: 'Trẻ em' },
