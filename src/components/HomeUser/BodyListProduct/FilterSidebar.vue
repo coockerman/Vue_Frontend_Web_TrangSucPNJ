@@ -85,14 +85,12 @@ const karat = ref('all')
 const gender = ref('all')
 
 const materials = [
-  { label: 'All', value: 'all' },
   { label: 'Vàng trắng', value: 'Vàng trắng' },
   { label: 'Vàng', value: 'Vàng' },
   { label: 'Bạc', value: 'Bạc' },
 ]
 
 const karats = [
-  { label: 'All', value: 'all' },
   { label: '10K', value: '10K' },
   { label: '14K', value: '14K' },
   { label: '18K', value: '18K' },
@@ -100,7 +98,6 @@ const karats = [
 ]
 
 const genders = [
-  { label: 'All', value: 'all' },
   { label: 'Nữ', value: 'Nữ' },
   { label: 'Nam', value: 'Nam' },
   { label: 'Trẻ em', value: 'Trẻ em' },
@@ -118,9 +115,17 @@ const applyFilters = () => {
   })
 }
 
-const setMaterial = (val) => (material.value = val)
-const setKarat = (val) => (karat.value = val)
-const setGender = (val) => (gender.value = val)
+const setMaterial = (val) => {
+  material.value = material.value === val ? 'all' : val
+}
+
+const setKarat = (val) => {
+  karat.value = karat.value === val ? 'all' : val
+}
+
+const setGender = (val) => {
+  gender.value = gender.value === val ? 'all' : val
+}
 
 const formatPrice = (num) => num.toLocaleString('vi-VN')
 </script>

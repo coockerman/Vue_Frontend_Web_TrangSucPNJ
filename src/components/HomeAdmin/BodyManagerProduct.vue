@@ -132,7 +132,6 @@
             </td>
             <td>
               <button @click="editProduct(product)">Sửa</button>
-              <button @click="deleteProduct(product.id)">Xóa</button>
             </td>
           </tr>
         </tbody>

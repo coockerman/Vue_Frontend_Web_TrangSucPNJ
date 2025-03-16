@@ -221,6 +221,9 @@ const fetchReviews = async () => {
 }
 // Kiểm tra sản phẩm có trong danh sách yêu thích không
 const checkFavoriteStatus = async (productId) => {
+  if (!userId) {
+    return
+  }
   try {
     const response = await axios.get(`http://localhost:5121/api/users/${userId}/favourites`)
     isFavorite.value = response.data.includes(productId)
@@ -231,6 +234,10 @@ const checkFavoriteStatus = async (productId) => {
 
 // Hàm thêm hoặc xoá sản phẩm khỏi danh sách yêu thích
 const toggleFavorite = async () => {
+  if (!userId) {
+    alert('Bạn cần đăng nhập trước')
+    return
+  }
   if (!product.value) return
 
   try {

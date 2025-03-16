@@ -1,10 +1,9 @@
 <template>
   <div class="payment-success">
     <div class="content">
-      <h1>🎉 Thanh toán thành công!</h1>
-      <p>Đơn hàng của bạn đã được xử lý. Cảm ơn bạn đã mua sắm! 🛒</p>
-
-      <p><strong>Mã đơn hàng:</strong> {{ orderId }}</p>
+      <h1>Thanh toán thành công!</h1>
+      <p>Đơn hàng của bạn đã được xử lý.</p>
+      <p>Cảm ơn bạn đã mua sắm!</p>
 
       <router-link to="/user-home" class="home-button">🏠 Quay lại trang chủ</router-link>
     </div>
@@ -54,7 +53,7 @@ export default {
   align-items: center;
   height: 100vh; /* Chiếm toàn bộ chiều cao màn hình */
   background: linear-gradient(135deg, #ffffff, #f5f5f5);
-  color: white;
+  color: rgb(0, 0, 0);
   text-align: center;
 }
 
@@ -64,7 +63,7 @@ export default {
   border-radius: 10px;
   backdrop-filter: blur(10px);
   box-shadow: 0 10px 30px rgba(63, 49, 49, 0.2);
-  max-width: 400px;
+  width: 400px;
 }
 
 h1 {
@@ -73,8 +72,9 @@ h1 {
 }
 
 p {
-  font-size: 18px;
+  font-size: 16px;
   margin: 10px 0;
+  color: #555;
 }
 
 .error-message {
@@ -106,7 +106,7 @@ p {
   margin-top: 15px;
   padding: 10px 20px;
   background: white;
-  color: #b0daff;
+  color: #1a805e;
   font-weight: bold;
   border-radius: 5px;
   text-decoration: none;
